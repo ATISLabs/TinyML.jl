@@ -18,25 +18,7 @@ module Genetic
     #= Exports =#
     export Train!, getFitness, setFitness!, TrainingSet
 
-    """
-        genExecute(tset::TrainingSet, genCount::Int)
-
-    Executes genetic algorithm on a pre-made training set for the number of generations specified
-    in 'genCount'.
-    To summarize, it resumes a training process.
-
-    # Example
-    ```julia_repl
-    julia> genExecute(tset, 10)
-    ```
-    In the example above, the genetic algorithm will execute the following steps:
-    - Loop generation until generation < genCount
-        - select some candidates from population (functions e.g genSelectionBest(), genSelectionRoulette)
-        - generate children based on selected candidates (functions e.g genCrossover(), genCrossoverClone())
-        - mutate some of the children weights (functions e.g genMutation())
-        - evaluate candidates
-    - Return training set
-    """
+    
     function Train!(tset::TrainingSet, genCount::Integer)
         evaluate!(tset)
         for gen in 1:genCount

@@ -10,40 +10,7 @@ getFitness(cand::Candidate) = cand.fitness[]
 getNetwork(cand::Candidate) = cand.net
 
 
-"""
-    mutable struct TrainingSet
 
-Stores all data for genetic algorithm.
-
-# Structure
-```julia
-candidates::Array{<:Candidate, 1}
-fitnessFunc::Function
-
-popSize::Int64
-selectedCandidatesCount::Int64
-crossoverCuttingFractionDivisor::Int64
-mutationRate::Float64
-```
-- candidates: Stores an array of candidates to be tested
-- fitnessFunc: Stores the function that evaluates candidates
-- popSize: Number of candidates
-- selectedCandidatesCount: Number of candidates to be selected to the next generation
-- crossoverCuttingFractionDivisor: Number used to find crossover point by splitting neurons
-     weights on crossover (crossoverPoint = numberOfWeightsPerNeuron / crossoverCuttingFractionDivisor)
-- mutationRate: Probability of mutation for each weight
-
-# Initialization
-```julia
-TrainingSet(candidates::Array{<:Candidate, 1}, fitnessFunc::Function, populationSize::Int64,
-            selectedCandidatesNumber::Int64, crossoverDivisor::Int64, mutationRate::Float64)
-```
-
-# Example
-```julia_repl
-julia> TrainingSet(snakeCandidates, snakeFitness, 2000, 10, 2, 0.1)
-```
-"""
 struct TrainingSet{N}
     isTrained::Ref{Bool}
 

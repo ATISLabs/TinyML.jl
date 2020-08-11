@@ -1,34 +1,3 @@
-"""
-    mutable struct BitTensor{N}
-
-A type used for Bit operations. It is different than BitArray{2}
-because it allocates ceil(columns / 64) for each line of the matrix.
-In reason of that, it uses slightly more memory than BitArray, but
-sometimes it increases performance by reducing shifting operations
-depending of how it is used. 
-
-# Structure
-mutable struct BitTensor
-    chunks::Array{UInt64, 2}
-    len::Int
-    dims::NTuple{2, Int}
-end
-
-# Initialization
-```julia
-BitTensor{N}(value [optional], lineNumber, columnNumber, ...)
-```
-Possible values
-- undef     (random)
-- true
-- false
-
-# Example
-```julia_repl
-julia> mat = BitTensor{1}(undef, 5, 5)
-julia> mat = BitTensor{1}(true, 5, 5)
-```
-"""
 mutable struct BitTensor{N} <: AbstractArray{Bool, N}
     chunks::Array{UInt64, N}
     len::Int
@@ -145,46 +114,10 @@ mutable struct BitTensor{N} <: AbstractArray{Bool, N}
         end
 end
 
-"""
-    size(BitTensor)
-
-Returns the BitTensor dimensions
-
-# Example
-```julia_repl
-julia> size(BitTensor(5, 6))
-(5, 6)
-```
-"""
 @inline Base.size(mat::BitTensor) = mat.dims
 
-"""
-    length(BitTensor)
-
-Returns the number of elements in a BitTensor
-
-# Example
-```julia_repl
-julia> length(BitTensor(2, 2))
-4
-```
-"""
 @inline Base.length(mat::BitTensor) = mat.len
 
-"""
-    getindex(BitTensor, line::Int, column::Int, ...)
-
-Returns a Bool representing a bit in the specified
-line and column of a BitTensor
-
-# Example
-```julia_repl
-julia> getindex(BitTensor(2, 2), 1, 1)
-true
-julia> matrix[1, 1]
-true
-```
-"""
 @inline function Base.getindex(mat::BitTensor{2}, i::Int, j::Int)
     jMod = (j - 1)  % 64
     return Bool((mat.chunks[i, ceil(Int, j / 64)] & (1 << jMod)) >> jMod)
@@ -202,48 +135,12 @@ end
     return Bool((mat.chunks[i, ceil(Int, j / 64), lastDims...] & (1 << jMod)) >> jMod)
 end
 
-"""
-    setBit(BitTensor, line::Int, column::Int)
-
-Sets a bit to 1 in the specified line and column
-of a BitTensor
-
-# Example
-```julia_repl
-julia> setBit(BitTensor(2, 2), 1, 1)
-```
-"""
 @inline setBit(mat::BitTensor, i::Int, j::Int, lastDims::Vararg{Int, N}) where {N} = 
     mat.chunks[i, ceil(Int, j / 64), lastDims...] |= 1 << ((j-1) % 64)
 
-"""
-    clearBit(BitTensor, line::Int, column::Int)
-
-Sets a bit to 0 in the specified line and column
-of a BitTensor
-
-# Example
-```julia_repl
-julia> clearBit(BitTensor(2, 2), 1, 1)
-```
-"""
 @inline clearBit(mat::BitTensor, i::Int, j::Int, lastDims::Vararg{Int, N}) where {N} =
     mat.chunks[i, ceil(Int, j / 64), lastDims...] &= ~(1 << ((j-1) % 64))
 
-"""
-    setindex!(BitTensor, value::Bool, line::Int, column::Int)
-
-Sets a bit to 'value' in the specified line and column
-of a BitTensor
-
-# Example
-```julia_repl
-julia> setindex!(BitTensor(2, 2), true, 1, 1)
-true
-julia> matrix[1, 1] = true
-true
-```
-"""
 @inline function Base.setindex!(mat::BitTensor{2}, value::Bool, i::Int, j::Int)
     jMod = (j - 1) % 64
     mat.chunks[i, ceil(Int, j / 64)] &= ~(1 << jMod)
