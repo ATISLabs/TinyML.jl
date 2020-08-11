@@ -26,31 +26,31 @@ function getDrawingMatrix(game::Game)
 end
 
 function nextFrame!(game::Game)
-	if !game.lost
+	if !isLost(game)
 		#Lost the game when the snake reaches map limits
 		if game.snake.direction == UP
 			if game.snake.head.y != 1
 				game.snake.head.y -= 1
 			else
-				game.lost = true
+				setLost!(game, true)
 			end
 		elseif game.snake.direction == DOWN
 			if game.snake.head.y != MAP_SIZE
 				game.snake.head.y += 1
 			else
-				game.lost = true
+				setLost!(game, true)
 			end
 		elseif game.snake.direction == LEFT
 			if game.snake.head.x != 1
 				game.snake.head.x -= 1
 			else
-				game.lost = true
+				setLost!(game, true)
 			end
 		else
 			if game.snake.head.x != MAP_SIZE
 				game.snake.head.x += 1
 			else
-				game.lost = true
+				setLost!(game, true)
 			end
 		end
 
@@ -66,7 +66,7 @@ function nextFrame!(game::Game)
 		for piece in game.snake.body[2:length(game.snake.body)]
 			if game.snake.head.x == piece.x &&
 				game.snake.head.y == piece.y
-				game.lost = true
+				setLost!(game, true)
 			end
 		end
 	end

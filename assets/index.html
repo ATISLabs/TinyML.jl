@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>BinarySnake</title>
+        <link rel="stylesheet" type="text/css" href="./style.css" />
+        <meta name="viewport" content="width=100px, initial-scale=1"/>
+    </head>
+    <body>
+        <div id="gameArea">
+            <canvas width="600" height="600" id="canvas"></canvas>
+            <script type="text/javascript" src="./script.js"></script>
+        </div>
+        <div id="statsArea">
+            <p><b>Genetic Algorithm</b></p>
+            <details>
+                <summary>Control</summary>
+                <input onclick="changeNet()" type="radio" name="radioNetType" id="radioFloatMlp" value="1" required checked>Float MLP</input>
+                <input onclick="changeNet()" type="radio" name="radioNetType" id="radioBinaryMlp" value="2" required>Binary MLP</input>
+                <input onclick="changeNet()" type="radio" name="radioNetType" id="radioFloatCnn" value="3" required>Float CNN</input>
+                <input onclick="changeNet()" type="radio" name="radioNetType" id="radioFloatCnn" value="4" required>Binary CNN</input>
+                <input onclick="changeNet()" type="radio" name="radioNetType" id="radioFloatNEAT" value="5" required>Float NEAT</input>
+                <input onclick="changeNet()" type="radio" name="radioNetType" id="radioFloatNEAT" value="6" required>Binary NEAT</input>
+                <form id="neatForm">
+                    <p>Generation Count</p>
+                    <input type="number" min="1" placeholder="10" id="inputNeatGen" />
+                    <p>Max Population</p>
+                    <input id="inputNeatMaxPop" min="1" type="number" placeholder="100" required/>
+                    <p>Delta Threshold</p>
+                    <input id="inputNeatDelta" type="number" min="0.05" step="0.05" placeholder="0.8"/>
+                    <p>C1</p>
+                    <input type="number" min="0.05" step="0.05" placeholder="0.5" id="inputNeatC1" />
+                    <p>C2</p>
+                    <input type="number" min="0.05" step="0.05" placeholder="0.5" id="inputNeatC2" />
+                    <p>C3</p>
+                    <input type="number" min="0.05" step="0.05" placeholder="0.5" id="inputNeatC3" />
+                    <p>Survival Rate</p>
+                    <input type="range" min="0.05" max="1" step="0.05" value="0.4" id="inputNeatSurvival" />
+                    <p>Reproduction Rate</p>
+                    <input type="range" min="0.05" max="1" step="0.05" value="1" id="inputNeatReproduction" />
+                    <p>Bias Mutation Rate</p>
+                    <input type="range" min="0.05" max="1" step="0.05" value="0.1" id="inputNeatBias" />
+                    <p>Weight Mutation Rate</p>
+                    <input type="range" min="0.05" max="1" step="0.05" value="0.2" id="inputNeatWeight" />
+                    <p>Toggle Connection Mutation Rate</p>
+                    <input type="range" min="0.05" max="1" step="0.05" value="0.1" id="inputNeatToggle" />
+                    <p>Add Node Mutation Rate</p>
+                    <input type="range" min="0.05" max="1" step="0.05" value="0.1" id="inputNeatNode" />
+                    <p>Add Connection Mutation Rate</p>
+                    <input type="range" min="0.05" max="1" step="0.05" value="0.1" id="inputNeatConnection" />
+                </form>
+                <form id="defaultForm">
+                    <p>Population Size</p>
+                    <input min="2" placeholder="2000" id="inputPopSize" type="number" required/>
+                    <p>Generation Count</p>
+                    <input min="1" placeholder="100" id="inputGenCount" type="number" required/>
+                    <p>Selected Number</p>
+                    <input min="1" placeholder="10" id="inputSelectionNumber" type="number"required/>
+                    <p>Crossover Divisor</p>
+                    <input min="1" placeholder="2" id="inputCrossoverDivisor" type="number" required/>
+                    <p>Mutation Rate</p>
+                    <input min="0.0" placeholder="0.1" id="inputMutationRate" type="range" step="0.01" max="1.0"required/>
+                    <p>Network type</p>
+                </form>
+                <div id="controlBtns">
+                    <input id="btnTrain" type="button" onclick="sendTrainData()" value="TRAIN NEW">
+                    <input id="btnTrain" type="button" onclick="sendTrainDataWithDataset()" value="TRAIN">
+                    <input onclick="sendMessageToJulia(GUI_CODE_WATCH)" id="btnWatch" type="button" value="WATCH">
+                    <input onclick="sendMessageToJulia(GUI_CODE_LOAD)" id="btnLoad" type="button" value="LOAD">
+                    <input onclick="sendMessageToJulia(GUI_CODE_SAVE)" id="btnSave" type="button" value="SAVE">
+                </div>
+            </details>
+            <br>
+            <details>
+                <summary>Stats</summary>
+                <p>
+                    <a>Current Gen: </a>
+                    <a id="lblCurrentGen">0</a>
+                </p>
+                <p>
+                    <a>Best Fitness: </a>
+                    <a id="lblBestFitness">0</a>
+                </p>
+                <br>
+                <p>
+                    <a>Population Size: </a>
+                    <a id="lblPopulationSize">0</a>
+                </p>
+                <p>
+                    <a>Generation Count: </a>
+                    <a id="lblGenerationCount">0</a>
+                </p>
+                <p>
+                    <a>Network Type: </a>
+                    <a id="lblNetworkType">0</a>
+                </p>
+            </details>
+        </div>
+    </body>
+</html>

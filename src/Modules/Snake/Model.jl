@@ -55,11 +55,14 @@ mutable struct Game
 		game.pos = 2
 		game.snake = Body()
 		game.fruit = Point2D(FOODPOS[1][1], FOODPOS[1][2])
-		game.lost = false
+		setLost!(game, false)
 
 		return game
 	end
 end
+
+@inline isLost(game::Game) = game.lost
+@inline setLost!(game::Game, value::Bool) = game.lost = value
 
 function setDirection!(game::Game, direction::Int)
 	if length(game.snake.body) > 1
