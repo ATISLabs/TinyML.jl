@@ -1,18 +1,23 @@
 module AI
+    using Flux
+
+    using ..BitFlux
+    using ..Genetic
+    using ..NEAT
     using ..Snake
 
     export Train!, createBitGeneticSet, createFloatGeneticSet, 
-            createFloatNEATSet, createGeneticSet
+            createFloatNEATSet, createGeneticSet, nextMovement!
     export NetworkType, FloatMLP, BitMLP, FloatNEAT, BitNEAT, FloatCNN, BitCNN
 
     const AI_MAX_MOVEMENT = 200
     const sensorCount = 20
 
-    @enum NetworkType FloatMLP BitMLP FloatNEAT BitNEAT FloatCNN BitCNN
+    @enum NetworkType FloatMLP=1 BitMLP FloatNEAT BitNEAT FloatCNN BitCNN
 
     const inputFunction = Ref{Function}(identity)
 
-    function getFloatSensorsData(game::SnakeGame)
+    function getFloatSensorsData(game::Game)
         data = Array{Float32, 1}(undef, 0)
 
         #fruit is on the left side
@@ -86,7 +91,7 @@ module AI
         return data
     end
 
-    function getBitSensorsData(game::SnakeGame)
+    function getBitSensorsData(game::Game)
         data = BitArray{1}(undef, 0)
 
         #fruit is on the left side
@@ -196,7 +201,7 @@ module AI
         game = Game()
 
         while !isLost(game) && movCount < AI_MAX_MOVEMENT &&
-                length(game.snake.body) < SNAKE_MAX_SIZE_TO_RANDOM
+                length(game.snake.body) < Snake.SNAKE_MAX_SIZE_TO_RANDOM
             nextMovement!(cand, game)
             prevSize = length(game.snake.body)
 
@@ -268,5 +273,4 @@ module AI
             Genetic.Train!(set, genCount)
         end
     end
-
 end

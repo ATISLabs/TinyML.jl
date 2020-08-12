@@ -137,22 +137,27 @@ function addElementValueToSendString(str, field)
     return str + GUI_CODE_SEPARATOR + document.getElementById(field).value
 }
 
+function addValueToSendString(str, value)
+{
+    return str + GUI_CODE_SEPARATOR + value
+}
+
 function sendTrainData()
 {
     if(isNeatSelected())
     {
-        if(checkFieldNEAT())
-        {
+        //if(checkFieldNEAT())
+        //{
             str = getSendString(GUI_CODE_TRAIN)
-            str = addElementValueToSendString(str, 
+            str = addValueToSendString(str, 
                         String(getNetworkType()))
             str = addElementValueToSendString(str, 'inputNeatGen')
+            str = addElementValueToSendString(str, 'inputNeatMaxPop')
+            str = addElementValueToSendString(str, 'inputNeatDelta')
             str = addElementValueToSendString(str, 'inputNeatC1')
             str = addElementValueToSendString(str, 'inputNeatC2')
             str = addElementValueToSendString(str, 'inputNeatC3')
-            str = addElementValueToSendString(str, 'inputNeatMaxPop')
             str = addElementValueToSendString(str, 'inputNeatSurvival')
-            str = addElementValueToSendString(str, 'inputNeatDelta')
             str = addElementValueToSendString(str, 'inputNeatReproduction')
             str = addElementValueToSendString(str, 'inputNeatBias')
             str = addElementValueToSendString(str, 'inputNeatWeight')
@@ -161,13 +166,13 @@ function sendTrainData()
             str = addElementValueToSendString(str, 'inputNeatConnection')
             
             sendMessageToJulia(str)
-        }
+        //}
     }
     else
         if(checkFields(true, true, true, true, true, true))
         {
             str = getSendString(GUI_CODE_TRAIN)
-            str = addElementValueToSendString(str, 
+            str = addValueToSendString(str, 
                         String(getNetworkType()))
             str = addElementValueToSendString(str, 'inputGenCount')
             str = addElementValueToSendString(str, 'inputPopSize')
@@ -201,17 +206,16 @@ function sendTrainDataWithDataset()
         sendMessageToJulia(str)
     }
     else
-        if(checkFields(false, true, true, true, true, false))
-        {
+    {
+    //    if(checkFields(false, true, true, true, true, false))
+    //    {
             str = getSendString(GUI_CODE_TRAIN_EXISTING)
 
             str += addElementValueToSendString(str, 'inputGenCount')
-/*            str += addElementValueToSendString(str, 'inputSelectionNumber')
-            str += addElementValueToSendString(str, 'inputCrossoverDivisor')
-            str += addElementValueToSendString(str, 'inputMutationRate')
-*/
+
             sendMessageToJulia(str)
-        }
+     //   }
+    }
 }
 
 /*//to fix

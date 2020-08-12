@@ -16,7 +16,7 @@ module Genetic
     include("./Genetic/Evaluate.jl")
 
     #= Exports =#
-    export Train!, getFitness, setFitness!, TrainingSet
+    export Train!, getFitness, setFitness!, TrainingSet, getChain
 
     
     function Train!(tset::TrainingSet, genCount::Integer)

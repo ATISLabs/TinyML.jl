@@ -213,6 +213,8 @@ mutable struct EvaluationLayer
 end
 
 #= Common/Other =#
+@inline getChain(set::TrainingSet) = set.chain
+
 function getEvaluationChain(set::TrainingSet)
     layers = []
     index = -1

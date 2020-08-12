@@ -1,21 +1,23 @@
-include("./SetController.jl")
 include("./InputController.jl")
+include("./SetController.jl")
 
-function loadJsConstants(w::Window)
+function loadJsConstants(d::GUIData)
+    w = getWindow(d)
     run(w, string("const GUI_CODE_SEPARATOR = '", GUI_CODE_SEPARATOR, "'"))
     run(w, string("const GUI_CODE_TRAIN = '", GUI_CODE_TRAIN, "'"))
     run(w, string("const GUI_CODE_WATCH = '", GUI_CODE_WATCH, "'"))
     run(w, string("const GUI_CODE_LOAD = '", GUI_CODE_LOAD, "'"))
     run(w, string("const GUI_CODE_SAVE = '", GUI_CODE_SAVE, "'"))
     run(w, string("const GUI_CODE_TRAIN_EXISTING = '", GUI_CODE_TRAIN_EXISTING, "'"))
-    run(w, string("const DRAW_MATRIX_SNAKE = '", DRAW_MATRIX_SNAKE, "'"))
-    run(w, string("const DRAW_MATRIX_VOID = '", DRAW_MATRIX_VOID, "'"))
-    run(w, string("const DRAW_MATRIX_FRUIT = '", DRAW_MATRIX_FRUIT, "'"))
+    run(w, string("const DRAW_MATRIX_SNAKE = '", Snake.DRAW_MATRIX_SNAKE, "'"))
+    run(w, string("const DRAW_MATRIX_VOID = '", Snake.DRAW_MATRIX_VOID, "'"))
+    run(w, string("const DRAW_MATRIX_FRUIT = '", Snake.DRAW_MATRIX_FRUIT, "'"))
 
     run(w, "window.requestAnimationFrame(drawGame)")
 end
 
-function drawGame(w::Window, game::Game)
+function drawGame(d::GUIData, game::Game)
+    w = getWindow(d)
     mat = getDrawingMatrix(game)
 
     str = "matrix = ["
@@ -41,8 +43,8 @@ function runGame(d::GUIData, interval::Float64)
     game = Game()
     move = 0
     while !isLost(game) && move < 50
-        drawGame(w, game)
-        nextMovement!(cand, game)
+        drawGame(d, game)
+        nextMovement!(getSet(d).chain, game)
 
         prevSize = length(game.snake.body)
         nextFrame!(game)
@@ -52,25 +54,22 @@ function runGame(d::GUIData, interval::Float64)
     end
 end
 
-function trainExisting!(d::GUIData, args...)
+function trainExisting!(d::GUIData, genCount::Int)
     currentGen = 1
-    while currentGen <= getGenCount(args)
+    while currentGen <= genCount
         AI.Train!(getSet(d), 1)
         #guiPrintStats(w, tset, netType, currentGen, genCount)
-        runGame(d)
+        runGame(d, GUI_TRAINING_FRAME_INTERVAL)
 
         currentGen += 1
     end
-
-    return tset
 end
 
-function Train!(d::GUIData, args::Array{String, 1})
+function train!(d::GUIData, args::Array{String, 1})
     nt = getNetType(args)
-    input = getTrainingInput(args)
-    setSet!(d, createSet(nt, args...))
-    trainExisting!(d, args)
-    return set
+    input = getSetInput(args)
+    setSet!(d, createSet(nt, input...))
+    trainExisting!(d, getGenCount(args))
 end
 
 function watch(d::GUIData)
@@ -80,31 +79,37 @@ end
 function loadTrainingSet(d::GUIData)
     if isfile(TSET_NAME)
         setSet!(d, loadSetFromFile())
+        setMessage!(d, "Training set loaded")
     else
         setMessage!(d, "No training set file")
     end
 end
 
+function saveTrainingSet(d::GUIData)
+    saveSetToFile(getSet(d)) 
+    setMessage!(d, "Training set saved")
+end
+
 function executeAction!(d::GUIData, input::String)
-    arr = getArgumentArray(input)
-    op = getCommand(input)
-    args = getInputArguments(input)
+    arr = getInputArray(input)
+    op = getCommand(arr)
+    args = getArguments(arr)
 
     w = getWindow(d)
 
     if op == GUI_CODE_TRAIN
-        setSet!(d, Train!(w, args))
+        train!(d, args)
     elseif op == GUI_CODE_LOAD
-        loadTrainingSet!(d)
+        loadTrainingSet(d)
     end
 
     if isSetLoaded(d)
         if op == GUI_CODE_TRAIN_EXISTING
-            tset = guiTrainExisting(w, tset, args)
+            tset = trainExisting!(d, getGenCount(args))
         elseif op == GUI_CODE_WATCH
             watch(d)
         elseif op == GUI_CODE_SAVE
-            guiSaveTrainingSet(w, tset)
+            saveTrainingSet(d)
         end
     else
         setMessage!(d, "No training set loaded")
@@ -113,6 +118,6 @@ end
 
 function startController()
     data = GUIData()
-    loadJsConstants(getWindow(d))
+    loadJsConstants(data)
     return data
 end

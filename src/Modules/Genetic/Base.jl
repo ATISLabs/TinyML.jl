@@ -122,3 +122,4 @@ function updateChain!(set::TrainingSet)
 end
 
 #= Common/Other =#
+@inline getChain(t::TrainingSet) = t.chain

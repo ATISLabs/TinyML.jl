@@ -16,7 +16,7 @@ module NEAT
     include("./NEAT/Mutation.jl")
 
     #= Exports =#
-    export Train!, NEATDense, TrainingSet
+    export Train!, NEATDense, TrainingSet, getChain
 
     #= Forward =#
     function (l::NEATDense)(input::Array{<:Number,1})

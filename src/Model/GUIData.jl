@@ -16,6 +16,8 @@ mutable struct GUIData
 
         d.window = w
         d.setLoaded = false
+        d.isRead = true
+        d.message = ""
 
         return d
     end
@@ -31,7 +33,7 @@ end
 @inline getSet(d::GUIData) = isSetLoaded(d) ? d.set : nothing
 
 @inline setRead!(d::GUIData, value::Bool) = d.isRead = value
-@inline hasMessage(d::GUIData) = d.isRead
+@inline hasMessage(d::GUIData) = !d.isRead
 
 function setMessage!(d::GUIData, msg::String)
     setRead!(d, false)

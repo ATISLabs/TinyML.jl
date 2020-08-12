@@ -4,15 +4,14 @@ module BinarySnake
     include("./Modules/NEAT.jl")
     include("./Modules/Snake.jl")
     include("./Controller/AI.jl")
-    include("./Controller/SetController.jl")
     using .BitFlux
     using .Genetic
     using .NEAT
     using .Snake
     using .AI
-    using .SetController
 
     using Electron
+    using JLD2
 
     include("./Model/GUIData.jl")
     include("./Model/GUIConstants.jl")
@@ -22,5 +21,4 @@ module BinarySnake
     startBinarySnake() = startGUI()
 
     export startBinarySnake
-
 end
