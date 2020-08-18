@@ -149,9 +149,10 @@ function sendTrainData()
         //if(checkFieldNEAT())
         //{
             str = getSendString(GUI_CODE_TRAIN)
+            str = addElementValueToSendString(str, 'inputNeatGen')
             str = addValueToSendString(str, 
                         String(getNetworkType()))
-            str = addElementValueToSendString(str, 'inputNeatGen')
+            str = addElementValueToSendString(str, 'inputNeatMaxSpecies')
             str = addElementValueToSendString(str, 'inputNeatMaxPop')
             str = addElementValueToSendString(str, 'inputNeatDelta')
             str = addElementValueToSendString(str, 'inputNeatC1')
@@ -169,19 +170,21 @@ function sendTrainData()
         //}
     }
     else
-        if(checkFields(true, true, true, true, true, true))
-        {
+    {
+        //if(checkFields(true, true, true, true, true, true))
+        //{
             str = getSendString(GUI_CODE_TRAIN)
+            str = addElementValueToSendString(str, 'inputGenCount')
             str = addValueToSendString(str, 
                         String(getNetworkType()))
-            str = addElementValueToSendString(str, 'inputGenCount')
             str = addElementValueToSendString(str, 'inputPopSize')
             str = addElementValueToSendString(str, 'inputSelectionNumber')
             str = addElementValueToSendString(str, 'inputCrossoverDivisor')
             str = addElementValueToSendString(str, 'inputMutationRate')
             
             sendMessageToJulia(str)
-        }
+        //}
+    }
 }
 
 function sendTrainDataWithDataset()
@@ -190,7 +193,7 @@ function sendTrainDataWithDataset()
     {
         str = getSendString(GUI_CODE_TRAIN_EXISTING)
 
-        str += addElementValueToSendString(str, 'inputNeatGen')
+        str = addElementValueToSendString(str, 'inputNeatGen')
         /*str += addElementValueToSendString(str, 'inputNeatDelta')
         str += addElementValueToSendString(str, 'inputNeatC1')
         str += addElementValueToSendString(str, 'inputNeatC2')
@@ -211,26 +214,21 @@ function sendTrainDataWithDataset()
     //    {
             str = getSendString(GUI_CODE_TRAIN_EXISTING)
 
-            str += addElementValueToSendString(str, 'inputGenCount')
+            str = addElementValueToSendString(str, 'inputGenCount')
 
             sendMessageToJulia(str)
      //   }
     }
 }
 
-/*//to fix
-function printStats(currGen, bestFit, popSize, genCount, selNumber, crossov, net, mutation)
+function printStats(currGen, genCount, bestFit, popSize, net)
 {
     document.getElementById('lblCurrentGen').innerHTML = currGen
     document.getElementById('lblBestFitness').innerHTML = bestFit
     document.getElementById('lblPopulationSize').innerHTML = popSize
     document.getElementById('lblGenerationCount').innerHTML = genCount
-    document.getElementById('lblSelectionNumber').innerHTML = selNumber
-    document.getElementById('lblCrossoverDivisorFactor').innerHTML = crossov
     document.getElementById('lblNetworkType').innerHTML = net
-    document.getElementById('lblMutationRate').innerHTML = mutation
 }
-*/
 
 function changeNet()
 {

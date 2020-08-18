@@ -23,15 +23,16 @@ function getNetType(code::Int)
     end=#
 end
 
-@inline getNetType(arr::Array{String,1}) = getNetType(parse(Int, arr[1]))
+@inline getNetType(arr::Array{String,1}) = getNetType(parse(Int, arr[2]))
 
 @inline isNeat(code::Int) = code > 4
+@inline isNeat(code::NetworkType) = (code == FloatNEAT || code == BitNEAT)
 
 function getSetInput(args::Array{String,1})
     nt = getNetType(args)
-    if isNeat(parse(Int, args[1]))
-        return (parse(Float64, args[3]),
-                parse(Float64, args[4]),
+    if isNeat(nt)
+        return (parse(Int, args[3]),
+                parse(Int, args[4]),
                 parse(Float64, args[5]),
                 parse(Float64, args[6]),
                 parse(Float64, args[7]),
@@ -41,7 +42,8 @@ function getSetInput(args::Array{String,1})
                 parse(Float64, args[11]),
                 parse(Float64, args[12]),
                 parse(Float64, args[13]),
-                parse(Float64, args[14]))
+                parse(Float64, args[14]),
+                parse(Float64, args[15]))
     else
         return (parse(Int, args[3]),
                 parse(Int, args[4]),
@@ -50,4 +52,4 @@ function getSetInput(args::Array{String,1})
     end
 end
 
-@inline getGenCount(input::Array{String,1}) = parse(Int, input[2])
+@inline getGenCount(input::Array{String,1}) = parse(Int, input[1])

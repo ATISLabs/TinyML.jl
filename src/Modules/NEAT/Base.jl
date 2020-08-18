@@ -120,7 +120,8 @@ mutable struct TrainingSet
     σ::Function
     in::Int
     out::Int
-    populationSize::Int
+    popSize::Int
+    maxSpecies::Int
     maxPopulation::Int
     isTrained::Bool
 
@@ -154,6 +155,7 @@ mutable struct TrainingSet
             c2=0.5,
             c3=0.5,
             maxPopulation=400,
+            maxSpecies=10,
             survivalRate=0.4,
             deltaThreshold=0.7, 
             reproductionRate=1,
@@ -174,13 +176,14 @@ mutable struct TrainingSet
         n.out = layer.out
         n.fitnessFunc = fitnessFunc
 
-        n.populationSize = 0
+        n.popSize = 0
         n.innovationNumber = 1
         n.innovations = Dict{Tuple{Int,Int}, Int}()
 
         n.c1 = c1
         n.c2 = c2
         n.c3 = c3
+        n.maxSpecies = maxSpecies
         n.maxPopulation = maxPopulation
         n.survivalRate = survivalRate
         n.deltaThreshold = deltaThreshold
@@ -332,7 +335,7 @@ function getRepresentant!(s::Specie)
     return s.candidates[1]
 end
 
-function getRepresentant(s::Specie)
+function unsafeGetRepresentant(s::Specie)
     return s.candidates[1]
 end
 

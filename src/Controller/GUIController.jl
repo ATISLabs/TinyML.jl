@@ -16,58 +16,44 @@ function loadJsConstants(d::GUIData)
     run(w, "window.requestAnimationFrame(drawGame)")
 end
 
-function drawGame(d::GUIData, game::Game)
-    w = getWindow(d)
-    mat = getDrawingMatrix(game)
-
-    str = "matrix = ["
-    limitLine = size(mat)[1] - 1
-    limitChar = size(mat)[2] - 1
-    for i in 1:limitLine
-        str = string(str, "[")
-        for j in 1:limitChar
-            str = string(str, "'", string(mat[i, j]), "',")
-        end
-        str = string(str, "'", string(mat[i, size(mat)[2]]), "'],")
-    end
-    str = string(str, "[")
-    for j in 1:limitChar
-        str = string(str, "'", string(mat[size(mat)[1], j]), "',")
-    end
-    str = string(str, "'", string(mat[size(mat)[1], size(mat)[2]]), "']]")
-
-    run(w, str)
-end
 
 function runGame(d::GUIData, interval::Float64)
     game = Game()
-    move = 0
-    while !isLost(game) && move < 50
+    moveCount = 0
+    while !isLost(game) && moveCount < 50
         drawGame(d, game)
         nextMovement!(getSet(d).chain, game)
 
         prevSize = length(game.snake.body)
         nextFrame!(game)
-        move += 1
-        move = (1 - (length(game.snake.body) - prevSize)) * move
+        moveCount += 1
+        moveCount = (1 - (length(game.snake.body) - prevSize)) * moveCount
         sleep(interval)
     end
 end
 
 function trainExisting!(d::GUIData, genCount::Int)
-    currentGen = 1
-    while currentGen <= genCount
-        AI.Train!(getSet(d), 1)
-        #guiPrintStats(w, tset, netType, currentGen, genCount)
-        runGame(d, GUI_TRAINING_FRAME_INTERVAL)
+    max = 6
+    if genCount < max
+        max = genCount
+    end
+    currentGen = 0
 
-        currentGen += 1
+    for i in 0:max
+        interval = floor(Int, i * genCount / max) - currentGen
+        currentGen += interval
+        printStats(d, currentGen, genCount, 
+                    AI.snakeFitness(getSet(d).chain),
+                    getSet(d).popSize, getNetworkType(d))
+        runGame(d, GUI_TRAINING_FRAME_INTERVAL)
+        AI.Train!(getSet(d), interval)
     end
 end
 
 function train!(d::GUIData, args::Array{String, 1})
     nt = getNetType(args)
     input = getSetInput(args)
+    setNetworkType!(d, nt)
     setSet!(d, createSet(nt, input...))
     trainExisting!(d, getGenCount(args))
 end
@@ -79,15 +65,15 @@ end
 function loadTrainingSet(d::GUIData)
     if isfile(TSET_NAME)
         setSet!(d, loadSetFromFile())
-        setMessage!(d, "Training set loaded")
+        jsAlert(d, "Training set loaded")
     else
-        setMessage!(d, "No training set file")
+        jsAlert(d, "No training set file")
     end
 end
 
 function saveTrainingSet(d::GUIData)
     saveSetToFile(getSet(d)) 
-    setMessage!(d, "Training set saved")
+    jsAlert(d, "Training set saved")
 end
 
 function executeAction!(d::GUIData, input::String)
@@ -112,7 +98,7 @@ function executeAction!(d::GUIData, input::String)
             saveTrainingSet(d)
         end
     else
-        setMessage!(d, "No training set loaded")
+        jsAlert(d, "No training set loaded")
     end
 end
 
@@ -120,4 +106,15 @@ function startController()
     data = GUIData()
     loadJsConstants(data)
     return data
+end
+
+function startGUI()
+    d = startController()
+    try
+        while(getWindow(d).exists)
+            executeAction!(d, getInput(d))
+        end
+    catch
+        println("Window closed")
+    end
 end

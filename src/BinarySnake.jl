@@ -14,9 +14,8 @@ module BinarySnake
     using JLD2
 
     include("./Model/GUIData.jl")
-    include("./Model/GUIConstants.jl")
+    include("./View/GUIView.jl")
     include("./Controller/GUIController.jl")
-    include("./View/GUI.jl")
 
     startBinarySnake() = startGUI()
 

@@ -1,11 +1,11 @@
 function crossover!(set::TrainingSet)
     children = Array{Network, 1}(undef, 0)
-    #equally divides maximum child number for each species
-    maxSpecieChild = floor(Int, (set.maxPopulation - set.populationSize) / length(set.species))
+
     for specie in set.species
-        #it means 'reproductionRate'% of the available number of children will be born
-        childLimit = ceil(Int, maxSpecieChild * set.reproductionRate)
-        for c in 1:childLimit
+        maxChild = set.maxPopulation - set.popSize
+        childCount = ceil(Int, length(specie.candidates) * set.reproductionRate)
+        childCount = (childCount > maxChild) ? maxChild : childCount
+        for c in 1:childCount
             father = specie[rand(1:length(specie))]
             mother = specie[rand(1:length(specie))]
 
@@ -37,21 +37,24 @@ end
 function crossoverCandidates(set::TrainingSet, f::Network, m::Network)
     fittest, other = f.fitness > m.fitness ? (f,m) : (m,f)
     child = deepcopy(fittest)
+#=
     for i in length(fittest.nodes)+1:length(other.nodes)
         addNode!(set, child)
     end
-    
-    if f.fitness == m.fitness
+  =#  
+    #=if f.fitness == m.fitness
         for (key, con) in other.connections
-                if !haskey(fittest.connections, key)
+            if !haskey(fittest.connections, key)
                 #possibly add other's nodes
                 addConnection!(set, child, key..., con=deepcopy(con))
-                else
-                child.connections[key].enabled = con.enabled
-                child.connections[key].weight = con.weight
+            else
+                if rand(Bool)
+                    child.connections[key].enabled = con.enabled
+                    child.connections[key].weight = con.weight
                 end
+            end
         end
-    else
+    else=#
         for (key, con) in other.connections
             if haskey(fittest.connections, key)
                 if rand(Bool)
@@ -60,13 +63,14 @@ function crossoverCandidates(set::TrainingSet, f::Network, m::Network)
                 end
             end
         end
-    end
-
+    #end
+        #=
     for i in (set.in+set.out+1):(length(child.nodes)+set.in)
         if length(child.nodes[i].connections) == 0
             delete!(child.nodes, i)
         end
     end
+    =#
 
     child.fitness = 0
     return child

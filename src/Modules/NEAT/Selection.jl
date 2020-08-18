@@ -1,11 +1,7 @@
 function selection!(set::TrainingSet, children::Array{Network,1})
-    #kills badly performed
-    survivalRate = set.survivalRate
-    for specie in set.species
-        sort!(specie)
-        killingPoint = ceil(Int, length(specie) * survivalRate)
-        specie.candidates = specie.candidates[1:killingPoint]
-    end
+    sortSpecies!(set.species)
+    killSpeciesExcess(set)
+    killBadlyPerformed(set)
 
     for child in children
         specie = findSpecie(set, child, sorted=true)
@@ -19,10 +15,27 @@ function selection!(set::TrainingSet, children::Array{Network,1})
         unsafeAdjustFitness!(specie, child)
     end
 
-    updatePopulationSize(set)
+    updatepopSize(set)
 end
 
 #= Selection functions =#
+@inline function sortSpecies!(arr::Array{Specie, 1})
+    sort!(arr, by=s->getRepresentant!(s).fitness, rev=true)
+end
+
+function killSpeciesExcess(set::TrainingSet)
+    if length(set.species) > set.maxSpecies
+        set.species = set.species[1:set.maxSpecies]
+    end
+end
+
+function killBadlyPerformed(set::TrainingSet)
+    for specie in set.species
+        killingPoint = ceil(Int, length(specie) * set.survivalRate)
+        specie.candidates = specie.candidates[1:killingPoint]
+    end
+end
+
 function δ(set::TrainingSet, cand1::Network, cand2::Network)
     disjoint, excess, matching, weight = 0,0,0,0
     nFactor = length(cand1.innovations) > length(cand2.innovations) ? 
@@ -52,7 +65,7 @@ end
 function findSpecie(set::TrainingSet, cand::Network; sorted::Bool=false)
     if sorted
         for specie in set.species
-            if isSameSpecie(set, getRepresentant(specie), cand)
+            if isSameSpecie(set, unsafeGetRepresentant(specie), cand)
                 return specie
             end
         end
@@ -72,10 +85,10 @@ end
 @inline adjustFitness!(set::TrainingSet, cand::Network) = 
             unsafeAdjustFitness!(findSpecie(set, cand), cand)
 
-function updatePopulationSize(set::TrainingSet)
+function updatepopSize(set::TrainingSet)
     temp = 0
     for specie in set.species
         temp += length(specie)
     end
-    set.populationSize = temp
+    set.popSize = temp
 end

@@ -13,7 +13,7 @@ module AI
     const AI_MAX_MOVEMENT = 200
     const sensorCount = 20
 
-    @enum NetworkType FloatMLP=1 BitMLP FloatNEAT BitNEAT FloatCNN BitCNN
+    @enum NetworkType FloatMLP=1 BitMLP FloatCNN BitCNN FloatNEAT=5 BitNEAT=6
 
     const inputFunction = Ref{Function}(identity)
 
@@ -226,7 +226,7 @@ module AI
         return fitness
     end
 
-    function createFloatNEATSet(maxPop::Int,
+    function createFloatNEATSet(maxSpecies::Int, maxPop::Int,
             deltaThreshold::Float64, c1::Float64, c2::Float64, c3::Float64,
             survivalRate::Float64, reproductionRate::Float64, biasMutationRate::Float64,
             weightMutationRate::Float64, toggleMutationRate::Float64,
@@ -234,7 +234,7 @@ module AI
         setInputFunction!(FloatNEAT)
         net = Chain(NEATDense(20,4,sigmoid))
         set = NEAT.TrainingSet(net, net.layers[1], snakeFitness,
-                        c1=c1, c2=c2, c3=c3, maxPopulation=maxPop,
+                        c1=c1, c2=c2, c3=c3, maxSpecies=maxSpecies,maxPopulation=maxPop,
                         survivalRate=survivalRate, deltaThreshold=deltaThreshold,
                         reproductionRate=reproductionRate, biasMutationRate=biasMutationRate,
                         weightMutationRate=weightMutationRate, 

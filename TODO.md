@@ -1,24 +1,24 @@
 # TODO List
 - [x] Game
-- [ ] Tests
+- [x] Tests
 - [x] Neural Network
-- [ ] Tests
+- [x] Tests
 - [x] Genetic Algorithm
-- [ ] Tests
+- [x] Tests
 - [x] Binary Neural Network
-- [ ] Tests
+- [x] Tests
 - [x] Binary Genetic
-- [ ] Tests
+- [x] Tests
 - [x] GUI
-- [ ] Tests
+- [x] Tests
 - [x] Matrix mult
-- [ ] Tests
+- [x] Tests
 - [x] XOR Improvement
-- [ ] Tests
+- [x] Tests
 - [x] Memory and CPU usage check and fix
-- [ ] Tests
+- [x] Tests
 - [x] Multi-core
-- [ ] Tests
+- [x] Tests
 - [x] Benchmarks
 - [ ] Docs
 - [ ] Readme
@@ -74,15 +74,15 @@ NEAT
         - [x] Add node
         - [x] Add connection
         - [x] Mutate weights
-- [ ] Genetic Refactoring
+- [x] Genetic Refactoring
 - [ ] Bit NEAT
 
 
 FROM-SCRATCH
-- [ ] Replace "BinarizedSnake" references to "BinarySnake"
+- [x] Replace "BinarizedSnake" references to "BinarySnake"
 
 
 BUG FIXES
-- [ ] GUI
-    - [ ] Resume training
+- [x] GUI
+    - [x] Resume training
     - [ ] Generation count

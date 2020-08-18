@@ -1,11 +1,25 @@
+# constants for standardizing data between julia and js
+const GUI_CODE_SEPARATOR = ":"
+const GUI_CODE_TRAIN = "001"
+const GUI_CODE_WATCH = "002"
+const GUI_CODE_LOAD = "003"
+const GUI_CODE_SAVE = "004"
+const GUI_CODE_TRAIN_EXISTING = "005"
+
+#other constants
+const GUI_CODE_WAIT_FOR_INPUT = ""
+
+# inverval in seconds between frames
+const GUI_TRAINING_FRAME_INTERVAL = 0.01
+const GUI_WATCHING_FRAME_INTERVAL = 0.1
+
 mutable struct GUIData
     window::Window
 
     set::Union{NEAT.TrainingSet, Genetic.TrainingSet}
     setLoaded::Bool
 
-    message::String
-    isRead::Bool
+    netType::NetworkType
 
     function GUIData()
         d = new()
@@ -16,8 +30,6 @@ mutable struct GUIData
 
         d.window = w
         d.setLoaded = false
-        d.isRead = true
-        d.message = ""
 
         return d
     end
@@ -32,16 +44,7 @@ function setSet!(d::GUIData, set::Union{NEAT.TrainingSet, Genetic.TrainingSet})
 end
 @inline getSet(d::GUIData) = isSetLoaded(d) ? d.set : nothing
 
-@inline setRead!(d::GUIData, value::Bool) = d.isRead = value
-@inline hasMessage(d::GUIData) = !d.isRead
-
-function setMessage!(d::GUIData, msg::String)
-    setRead!(d, false)
-    d.message = msg
-end
-function getMessage(d::GUIData)
-    setRead!(d, true)
-    return d.message
-end
-
 @inline getWindow(d::GUIData) = d.window
+
+@inline getNetworkType(d::GUIData) = d.netType
+@inline setNetworkType!(d::GUIData, net::AI.NetworkType) = d.netType = net
