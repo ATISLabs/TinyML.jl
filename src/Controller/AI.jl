@@ -226,6 +226,13 @@ module AI
         return fitness
     end
 
+    function snakeFitnessNeat(chain::Chain)
+        fit = snakeFitness(chain)
+        fit = 50* fit + fit * length(chain.layers[1].net.connections) / 
+                    length(chain.layers[1].net.nodes)
+        return fit
+    end
+
     function createFloatNEATSet(maxSpecies::Int, maxPop::Int,
             deltaThreshold::Float64, c1::Float64, c2::Float64, c3::Float64,
             survivalRate::Float64, reproductionRate::Float64, biasMutationRate::Float64,
@@ -233,7 +240,7 @@ module AI
             addNodeMutationRate::Float64, addConnectionMutationRate::Float64)
         setInputFunction!(FloatNEAT)
         net = Chain(NEATDense(20,4,sigmoid))
-        set = NEAT.TrainingSet(net, net.layers[1], snakeFitness,
+        set = NEAT.TrainingSet(net, net.layers[1], snakeFitnessNeat,
                         c1=c1, c2=c2, c3=c3, maxSpecies=maxSpecies,maxPopulation=maxPop,
                         survivalRate=survivalRate, deltaThreshold=deltaThreshold,
                         reproductionRate=reproductionRate, biasMutationRate=biasMutationRate,
