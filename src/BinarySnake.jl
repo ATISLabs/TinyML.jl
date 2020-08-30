@@ -4,6 +4,7 @@ module BinarySnake
     include("./Modules/NEAT.jl")
     include("./Modules/Snake.jl")
     include("./Controller/AI.jl")
+    
     using .BitFlux
     using .Genetic
     using .NEAT

@@ -216,6 +216,9 @@ mutable struct EvaluationLayer
 end
 
 #= Common/Other =#
+#@inline randFloatWeight() = rand(Uniform(-1, 1))
+#@inline randBinaryWeight() = rand([-1, 1])
+
 @inline getChain(set::TrainingSet) = set.chain
 
 function getEvaluationChain(set::TrainingSet)
