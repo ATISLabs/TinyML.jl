@@ -6,7 +6,7 @@ module BinarySnake
     include("./Controller/AI.jl")
     
     using .BitFlux
-    using .Genetic
+    #=using .Genetic
     using .NEAT
     using .Snake
     using .AI
@@ -21,4 +21,5 @@ module BinarySnake
     startBinarySnake() = startGUI()
 
     export startBinarySnake
+    =#
 end

@@ -10,14 +10,15 @@
 @inline function mutate!(set::TrainingSet, net::Union{Dense,BitDense})
     w, b, rate = net.W, net.b, getMutationRate(set)
 
-    for i in 1:size(w,1)
-        for j in 1:size(w,2)
-            w[i,j] = randomizeWeight(w, i, j, rate)
+    for i in 1:size(w,2)
+        for j in 1:size(w,1)
+            w[j,i] = randomizeWeight(w, j, i, rate)
         end
+    end
+    for i in 1:length(b)
         b[i] = randomizeBias(b, i, rate)
     end
 end
-
 
 function mutation!(set::TrainingSet)
     cands = view(getCandidates(set), getElitism(set)+1:length(getCandidates(set)))

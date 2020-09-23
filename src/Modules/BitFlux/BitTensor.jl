@@ -14,7 +14,8 @@ mutable struct BitTensor{N} <: AbstractArray{Bool, N}
     end
 
     function BitTensor{2}(value, rows::Int, cols::Int)
-        chunkDims = (rows, ceil(Int, cols / 64))
+        #inverted to be cache friendly when using iterating over rows
+        chunkDims = (ceil(Int, cols / 64), rows)
         if value == undef
             chunks = rand(UInt64, chunkDims)
         elseif value == true
@@ -27,7 +28,7 @@ mutable struct BitTensor{N} <: AbstractArray{Bool, N}
             rest = 64 - (cols % 64)
             if rest < 64
                 for i in 1:rows
-                    chunks[i,end] = (chunks[i,end] << rest) >> rest
+                    chunks[end,i] = (chunks[end,i] << rest) >> rest
                 end
             end
         end
@@ -115,12 +116,13 @@ mutable struct BitTensor{N} <: AbstractArray{Bool, N}
 end
 
 @inline Base.size(mat::BitTensor) = mat.dims
+@inline Base.size(mat::BitTensor, dim::Int) = mat.dims[dim]
 
 @inline Base.length(mat::BitTensor) = mat.len
 
 @inline function Base.getindex(mat::BitTensor{2}, i::Int, j::Int)
     jMod = (j - 1)  % 64
-    return Bool((mat.chunks[i, ceil(Int, j / 64)] & (1 << jMod)) >> jMod)
+    return Bool((mat.chunks[ceil(Int, j / 64), i] & (1 << jMod)) >> jMod)
 end
 @inline function Base.getindex(mat::BitTensor{3}, i::Int, j::Int, k::Int)
     jMod = (j - 1) % 64
@@ -135,16 +137,13 @@ end
     return Bool((mat.chunks[i, ceil(Int, j / 64), lastDims...] & (1 << jMod)) >> jMod)
 end
 
-@inline setBit(mat::BitTensor, i::Int, j::Int, lastDims::Vararg{Int, N}) where {N} = 
-    mat.chunks[i, ceil(Int, j / 64), lastDims...] |= 1 << ((j-1) % 64)
 
-@inline clearBit(mat::BitTensor, i::Int, j::Int, lastDims::Vararg{Int, N}) where {N} =
-    mat.chunks[i, ceil(Int, j / 64), lastDims...] &= ~(1 << ((j-1) % 64))
+
 
 @inline function Base.setindex!(mat::BitTensor{2}, value::Bool, i::Int, j::Int)
     jMod = (j - 1) % 64
-    mat.chunks[i, ceil(Int, j / 64)] &= ~(1 << jMod)
-    mat.chunks[i, ceil(Int, j / 64)] |= value << jMod 
+    mat.chunks[ceil(Int, j / 64), i] &= ~(1 << jMod)
+    mat.chunks[ceil(Int, j / 64), i] |= value << jMod 
 end
 @inline function Base.setindex!(mat::BitTensor{3}, value::Bool, i::Int, j::Int, k::Int)
     jMod = (j - 1) % 64
@@ -156,7 +155,8 @@ end
     mat.chunks[i, ceil(Int, j / 64), k, l] &= ~(1 << jMod)
     mat.chunks[i, ceil(Int, j / 64), k, l] |= value << jMod 
 end
-@inline function Base.setindex!(mat::BitTensor, value::Bool, i::Int, j::Int, lastDims::Vararg{Int, N}) where{N}
+@inline function Base.setindex!(mat::BitTensor, value::Bool, i::Int, j::Int, 
+        lastDims::Vararg{Int, N}) where{N}
     jMod = (j - 1) % 64
     mat.chunks[i, ceil(Int, j / 64), lastDims...] &= ~(1 << jMod)
     mat.chunks[i, ceil(Int, j / 64), lastDims...] |= value << jMod 

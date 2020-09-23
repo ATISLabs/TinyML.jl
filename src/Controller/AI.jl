@@ -228,7 +228,7 @@ module AI
 
     function snakeFitnessNeat(chain::Chain)
         fit = snakeFitness(chain)
-        fit = 50* fit + fit * length(chain.layers[1].net.connections) / 
+        fit = 50 * fit + fit * length(chain.layers[1].net.connections) / 
                     length(chain.layers[1].net.nodes)
         return fit
     end
@@ -273,11 +273,11 @@ module AI
                     popSize, elitism, crossoverDivisor, mutationRate)
     end
 
-    @inline function Train!(set::Union{NEAT.TrainingSet,Genetic.TrainingSet}, genCount::Int)
+    @inline function Train!(set::Union{NEAT.TrainingSet,Genetic.TrainingSet}, genNumber::Int)
         if set isa NEAT.TrainingSet
-            NEAT.Train!(set, genCount)
+            NEAT.Train!(set, genNumber=genNumber)
         else
-            Genetic.Train!(set, genCount)
+            Genetic.Train!(set, genNumber=genNumber)
         end
     end
 end

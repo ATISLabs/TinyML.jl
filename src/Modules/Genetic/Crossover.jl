@@ -16,18 +16,17 @@ function crossoverMixParentsWeights!(set::TrainingSet,
     motherB = mother.b
     childB = child.b
 
-    for i in 1:crosspt
-        for j in 1:jlim
-           childW[i,j] = fatherW[i,j] 
+    for i in 1:jlim
+        for j in 1:crosspt
+           childW[j,i] = fatherW[j,i] 
         end
-        childB[i] = fatherB[i]
     end
-    for i in crosspt+1:ilim
-        for j in 1:jlim
-           childW[i,j] = motherW[i,j] 
+    for i in 1:jlim
+        for j in crosspt+1:ilim
+           childW[j,i] = motherW[j,i] 
         end
-        childB[i] = motherB[i]
     end
+    childB .= fatherB
 end
 
 function crossoverMixParentsWeights!(set::TrainingSet, 
@@ -44,19 +43,17 @@ function crossoverMixParentsWeights!(set::TrainingSet,
     motherB = mother.b
     childB = child.b
     
-
-    for i in 1:crosspt
-        for j in 1:jlim
-            @inbounds childW[i,j] = fatherW[i,j]
+    for i in 1:jlim
+        for j in 1:crosspt
+            @inbounds childW[j,i] = fatherW[j,i]
         end
-        @inbounds childB[i] = fatherB[i]
     end
-    for i in crosspt+1:ilim
-        for j in 1:jlim
-            @inbounds childW[i,j] = motherW[i,j]
+    for i in 1:jlim
+        for j in crosspt+1:ilim
+            @inbounds childW[j,i] = motherW[j,i]
         end
-        @inbounds childB[i] = motherB[i]
     end
+    childB .= fatherB
 end
 
 function crossover!(set::TrainingSet)

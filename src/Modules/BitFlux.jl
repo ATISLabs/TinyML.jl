@@ -2,6 +2,7 @@ module BitFlux
     #= Imports =#
     using Distributions: Uniform
     using Random: bitrand
+    using Flux
 
     #= Exports =#
     export BitDense, BitTensor

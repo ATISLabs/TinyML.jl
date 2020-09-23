@@ -19,18 +19,22 @@ module Genetic
     export Train!, getFitness, setFitness!, TrainingSet, getChain
 
     
-    function Train!(tset::TrainingSet, genCount::Integer)
+    function Train!(tset::TrainingSet; 
+            genNumber::Integer=typemax(Int64), maxFitness::Float64=Inf64)
         evaluate!(tset)
-        for gen in 1:genCount
+        gen = 0
+        while gen < genNumber && 
+                getFitness(tset.candidates[1]) < maxFitness
             selectionBest!(tset)
             crossover!(tset)
             mutation!(tset)
             evaluate!(tset)
+            gen += 1
         end
 
         updateChain!(tset)
 
-        return tset
+        return (tset, gen)
     end
 
 end

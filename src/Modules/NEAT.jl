@@ -28,7 +28,8 @@ module NEAT
     end
 
     #= Genetic =#
-    function Train!(set::TrainingSet, genCount::Int)
+    function Train!(set::TrainingSet; genNumber::Int=typemax(Int64), 
+            maxFitness::Float64 = Inf64)
         children::Array{Network} = []
         if set.isTrained
             children = crossover!(set)
@@ -39,11 +40,14 @@ module NEAT
             set.isTrained = true
         end
 
-        for gen in 1:genCount
+        gen = 0
+        while gen < genNumber && 
+                getFitness(unsafeGetRepresentant(set.species[1])) < maxFitness
             selection!(set, children)
             children = crossover!(set)
             mutation!(set, children)
             evaluate!(set, children)
+            gen += 1
         end
         selection!(set, children)
 

@@ -221,6 +221,8 @@ end
 
 @inline getChain(set::TrainingSet) = set.chain
 
+@inline getFitness(candidate::Network) = candidate.fitness
+
 function getEvaluationChain(set::TrainingSet)
     layers = []
     index = -1
