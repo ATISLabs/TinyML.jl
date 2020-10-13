@@ -79,7 +79,7 @@ NEAT
 
 
 FROM-SCRATCH
-- [x] Replace "BinarizedSnake" references to "BinarySnake"
+- [x] Replace "BinarizedSnake" references to "TinyML"
 
 
 BUG FIXES

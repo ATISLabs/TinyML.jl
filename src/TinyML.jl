@@ -1,4 +1,4 @@
-module BinarySnake
+module TinyML
     include("./Modules/BitFlux.jl")
     include("./Modules/Genetic.jl")
     include("./Modules/NEAT.jl")
@@ -6,7 +6,7 @@ module BinarySnake
     include("./Controller/AI.jl")
     
     using .BitFlux
-    #=using .Genetic
+    using .Genetic
     using .NEAT
     using .Snake
     using .AI
@@ -18,8 +18,8 @@ module BinarySnake
     include("./View/GUIView.jl")
     include("./Controller/GUIController.jl")
 
-    startBinarySnake() = startGUI()
+    startTinyML() = startGUI()
 
-    export startBinarySnake
-    =#
+    export startTinyML
+    
 end

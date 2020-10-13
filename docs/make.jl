@@ -1,3 +1,3 @@
-using Documenter, BinarySnake
+using Documenter, TinyML
 
-makedocs(sitename="BinarySnake.jl")
+makedocs(sitename="TinyML.jl")

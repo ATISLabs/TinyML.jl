@@ -8,8 +8,12 @@ function evaluate!(set::TrainingSet, children::Array{Network,1})
         stop = (start <= length(children)) * ceil(Int, (thread+1) * length(tChildren) / Threads.nthreads())
 
         for i in start:stop
+            fitness = 0.0
             unsafeReplaceNetwork!(chain, index, tChildren[i])
-            tChildren[i].fitness = fitnessFunc(chain)
+            for j in 1:getEvalsPerCandidate(set)
+                fitness += fitnessFunc(chain)
+            end
+            tChildren[i].fitness = fitness / getEvalsPerCandidate(set)
         end
     end
 end

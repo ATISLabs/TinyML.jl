@@ -60,6 +60,7 @@ end
     l(signbit.(x))
 
 #Flux Overloading
+#=
 struct TrainingData{N} <: AbstractArray{Float32, N}
     bit::Union{BitTensor{N}, BitArray{N}}
     float::Array{Float32, N}
@@ -89,7 +90,51 @@ function Flux.update!(opt, x::TrainingData, x̄)
     Flux.update!(opt, getFloatArray(x), x̄)
     getBitArray(x) .= signbit.(getFloatArray(x))
 end
+function newDenseFromBitDense(l::BitDense)
+    out = Dense(size(l.W, 2), size(l.W, 1))
+    out.W .= l.W
+    out.b .= l.b
+    out
+end
 
+function newBitDenseFromDense(l::Dense)
+    out = BitDense(size(l.W, 2), size(l.W, 1))
+    out.W .= signbit.(l.W)
+    out.b .= signbit.(l.b)
+    out
+end
+
+function convertDenseToBitDense!(l::Dense, b::BitDense)
+    b.W .= signbit.(l.W)
+    b.b .= signbit.(l.b)
+end
+
+function newFloatChainFromBit(net::Chain)
+    newLayers = []
+    for layer in net.layers
+        if layer isa BitDense
+            push!(newLayers, newDenseFromBitDense(layer))
+        else
+            push!(newLayers, layer)
+        end
+    end
+    Chain(newLayers...)
+end
+
+function convertChainToBit!(original::Chain, trained::Chain)
+    for (ol, tl) in zip(original.layers, trained.layers)
+        if ol isa BitDense
+            convertDenseToBitDense!(tl, ol)
+        end
+    end
+end
+
+function train!(loss, chain::Chain, data, opt; cb = () -> ())
+    fChain = newFloatChainFromBit(chain)
+    Flux.train!(loss, params(fChain), data, opt, cb=cb)
+    convertChainToBit!(chain, fChain)
+end
+=#
 
 #Julia Base
 function Base.show(io::IO, l::BitDense)
@@ -100,5 +145,5 @@ function Base.show(io::IO, l::BitDense)
     end
 end
 
-Base.show(io::IO, t::TrainingData) = 
-    print(io, "TrainingData($(size(t.float,1))x$(size(t.float,2)))")
+#=Base.show(io::IO, t::TrainingData) = 
+    print(io, "TrainingData($(size(t.float,1))x$(size(t.float,2)))")=#

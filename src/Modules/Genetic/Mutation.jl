@@ -21,7 +21,7 @@
 end
 
 function mutation!(set::TrainingSet)
-    cands = view(getCandidates(set), getElitism(set)+1:length(getCandidates(set)))
+    cands = getChildren(set)
     Threads.@threads for child in cands
         layers = getNetwork(child).layers
         for i in set.indexes

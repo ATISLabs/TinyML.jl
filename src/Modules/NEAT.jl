@@ -16,7 +16,7 @@ module NEAT
     include("./NEAT/Mutation.jl")
 
     #= Exports =#
-    export Train!, NEATDense, TrainingSet, getChain
+    export train!, NEATDense, TrainingSet, getChain
 
     #= Forward =#
     function (l::NEATDense)(input::Array{<:Number,1})
@@ -28,7 +28,7 @@ module NEAT
     end
 
     #= Genetic =#
-    function Train!(set::TrainingSet; genNumber::Int=typemax(Int64), 
+    function train!(set::TrainingSet; genNumber::Int=typemax(Int64), 
             maxFitness::Float64 = Inf64)
         children::Array{Network} = []
         if set.isTrained

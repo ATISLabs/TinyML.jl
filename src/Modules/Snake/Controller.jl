@@ -1,15 +1,15 @@
 function randomizeFoodPosition!(game::Game)
-	if length(game.snake.body) > SNAKE_MAX_SIZE_TO_RANDOM
+	#if length(game.snake.body) > SNAKE_MAX_SIZE_TO_RANDOM
 		game.fruit.x = rand(1:MAP_SIZE)
 		game.fruit.y = rand(1:MAP_SIZE)
-	else
+	#=else
 		game.fruit.x = FOODPOS[game.pos][1]
 		game.fruit.y = FOODPOS[game.pos][2]
 		game.pos+=1
 		if game.pos == length(FOODPOS)
 			game.pos = 1
 		end
-	end
+	end=#
 end
 
 function getDrawingMatrix(game::Game)

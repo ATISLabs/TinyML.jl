@@ -81,3 +81,7 @@ function setDirection!(game::Game, direction::Int)
 	end
 		game.snake.direction = direction
 end
+
+
+@inline getSnakeSize(snake::Body) = length(snake.body)
+@inline getSnakeSize(game::Game) = getSnakeSize(game.snake)

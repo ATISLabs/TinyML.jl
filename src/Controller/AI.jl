@@ -6,7 +6,7 @@ module AI
     using ..NEAT
     using ..Snake
 
-    export Train!, createBitGeneticSet, createFloatGeneticSet, 
+    export train!, createBitGeneticSet, createFloatGeneticSet, 
             createFloatNEATSet, createGeneticSet, nextMovement!
     export NetworkType, FloatMLP, BitMLP, FloatNEAT, BitNEAT, FloatCNN, BitCNN
 
@@ -194,32 +194,34 @@ module AI
     end
 
     function snakeFitness(cand::Chain)
-        maxMovement = AI_MAX_MOVEMENT
+        #maxMovement = AI_MAX_MOVEMENT
         movCount = 0
         fitness = 0.0
 
         game = Game()
 
-        while !isLost(game) && movCount < AI_MAX_MOVEMENT &&
-                length(game.snake.body) < Snake.SNAKE_MAX_SIZE_TO_RANDOM
+        while !isLost(game) && movCount < AI_MAX_MOVEMENT# &&
+                #length(game.snake.body) < Snake.SNAKE_MAX_SIZE_TO_RANDOM
             nextMovement!(cand, game)
-            prevSize = length(game.snake.body)
-
-            distanceA = calculateFruitDistance(game)
+            prevSize = getSnakeSize(game)
+        #    distanceA = calculateFruitDistance(game)
     
             nextFrame!(game)
 
-            distanceB = calculateFruitDistance(game)
+        #    distanceB = calculateFruitDistance(game)
             movCount += 1
-            
-            if distanceB < distanceA
+            if prevSize < getSnakeSize(game)
+                movCount = 0
+            end
+        #=    if distanceB < distanceA
                 fitness += 1 / (distanceB + movCount)
                 distanceA = distanceB
             else
                 fitness -= 1 / (distanceB + movCount)
             end
+        =#
 
-            movCount = (1 - (length(game.snake.body) - prevSize)) * movCount
+            #movCount = (1 - (length(game.snake.body) - prevSize)) * movCount
         end
         fitness += 5 * (length(game.snake.body) - 1) + 1
 
@@ -242,6 +244,7 @@ module AI
         net = Chain(NEATDense(20,4,sigmoid))
         set = NEAT.TrainingSet(net, net.layers[1], snakeFitnessNeat,
                         c1=c1, c2=c2, c3=c3, maxSpecies=maxSpecies,maxPopulation=maxPop,
+                        evalsPerCandidate=10,
                         survivalRate=survivalRate, deltaThreshold=deltaThreshold,
                         reproductionRate=reproductionRate, biasMutationRate=biasMutationRate,
                         weightMutationRate=weightMutationRate, 
@@ -254,6 +257,7 @@ module AI
     function createGeneticSet(chain::Chain, popSize::Int,
         elitism::Int, crossoverDivisor::Int, mutationRate::Float64)
         set = Genetic.TrainingSet(chain, chain.layers, snakeFitness,
+                    evalsPerCandidate=10,
                     popSize=popSize, elitism=elitism, 
                     crossoverDivisor=crossoverDivisor, mutationRate=mutationRate)
         return set
@@ -273,11 +277,11 @@ module AI
                     popSize, elitism, crossoverDivisor, mutationRate)
     end
 
-    @inline function Train!(set::Union{NEAT.TrainingSet,Genetic.TrainingSet}, genNumber::Int)
+    @inline function train!(set::Union{NEAT.TrainingSet,Genetic.TrainingSet}, genNumber::Int)
         if set isa NEAT.TrainingSet
-            NEAT.Train!(set, genNumber=genNumber)
+            NEAT.train!(set, genNumber=genNumber)
         else
-            Genetic.Train!(set, genNumber=genNumber)
+            Genetic.train!(set, genNumber=genNumber)
         end
     end
 end

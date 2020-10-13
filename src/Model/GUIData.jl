@@ -24,7 +24,7 @@ mutable struct GUIData
     function GUIData()
         d = new()
 
-        html = string("file://", joinpath(dirname(dirname(pathof(BinarySnake))), "assets/index.html"))
+        html = string("file://", joinpath(dirname(dirname(pathof(TinyML))), "assets/index.html"))
         global app = Application()
         w = Window(app, URI(html))
 

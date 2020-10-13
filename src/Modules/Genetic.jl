@@ -16,15 +16,17 @@ module Genetic
     include("./Genetic/Evaluate.jl")
 
     #= Exports =#
-    export Train!, getFitness, setFitness!, TrainingSet, getChain
+    export train!, getFitness, setFitness!, TrainingSet, getChain
 
     
-    function Train!(tset::TrainingSet; 
+    function train!(tset::TrainingSet; 
             genNumber::Integer=typemax(Int64), maxFitness::Float64=Inf64)
-        evaluate!(tset)
+        if !isTrained(tset)
+            evaluate!(tset)
+        end
         gen = 0
         while gen < genNumber && 
-                getFitness(tset.candidates[1]) < maxFitness
+                unsafeGetBest(tset) < maxFitness
             selectionBest!(tset)
             crossover!(tset)
             mutation!(tset)

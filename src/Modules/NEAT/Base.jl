@@ -126,6 +126,7 @@ mutable struct TrainingSet
     isTrained::Bool
 
     #Evaluation
+    evalsPerCandidate::Int
     fitnessFunc::Function
 
     #Selection
@@ -151,6 +152,7 @@ mutable struct TrainingSet
     function TrainingSet(chain::Chain,
             layer::NEATDense,
             fitnessFunc::Function;
+            evalsPerCandidate::Int=1,
             c1=0.5,
             c2=0.5,
             c3=0.5,
@@ -171,6 +173,7 @@ mutable struct TrainingSet
 
         n.isTrained = false
         n.layer = layer
+        n.evalsPerCandidate = evalsPerCandidate
         n.σ = layer.σ
         n.in = layer.in
         n.out = layer.out
@@ -218,9 +221,8 @@ end
 #= Common/Other =#
 #@inline randFloatWeight() = rand(Uniform(-1, 1))
 #@inline randBinaryWeight() = rand([-1, 1])
-
+@inline getEvalsPerCandidate(set::TrainingSet) = set.evalsPerCandidate
 @inline getChain(set::TrainingSet) = set.chain
-
 @inline getFitness(candidate::Network) = candidate.fitness
 
 function getEvaluationChain(set::TrainingSet)

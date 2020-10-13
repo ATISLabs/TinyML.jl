@@ -46,7 +46,7 @@ function trainExisting!(d::GUIData, genCount::Int)
                     AI.snakeFitness(getSet(d).chain),
                     getSet(d).popSize, getNetworkType(d))
         runGame(d, GUI_TRAINING_FRAME_INTERVAL)
-        AI.Train!(getSet(d), interval)
+        AI.train!(getSet(d), interval)
     end
 end
 
@@ -110,11 +110,11 @@ end
 
 function startGUI()
     d = startController()
-    try
+    #try
         while(getWindow(d).exists)
             executeAction!(d, getInput(d))
         end
-    catch
+    #=catch
         println("Window closed")
-    end
+    end=#
 end

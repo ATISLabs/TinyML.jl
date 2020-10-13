@@ -57,8 +57,8 @@ function crossoverMixParentsWeights!(set::TrainingSet,
 end
 
 function crossover!(set::TrainingSet)
-    cands = view(getCandidates(set), (getElitism(set)+1):length(getCandidates(set)))
-    elitism = view(getCandidates(set), 1:getElitism(set))
+    cands = getChildren(set)
+    elitism = getBestPerformed(set)
 
     Threads.@threads for child in cands
         father = getNetwork(rand(elitism)).layers
@@ -72,10 +72,10 @@ function crossover!(set::TrainingSet)
 end
 
 function crossoverClone!(set::TrainingSet)
-    cands = view(getCandidates(set), getElitism(set)+1:length(getCandidates(set)))
-    elitism = view(getCandidates(set), 1:getElitism(set))
-    Threads.@threads for i in 1:length(cands)
+    children = getChildren(set)
+    elitism = getBestPerformed(set)
+    Threads.@threads for i in 1:length(children)
         parent = rand(elitism)
-        cands[i] = Candidate(set, parent)
+        children[i] = Candidate(set, parent)
     end
 end

@@ -2,6 +2,6 @@
     net = Chain(NEAT.NEATDense(2,1))
     func(net::Chain) = 1 / abs(net([3,2])[1] - 0.5)
     set = NEAT.TrainingSet(net, net.layers[1], func)
-    NEAT.Train!(set, 50)
+    NEAT.train!(set, 50)
     @test round(net([3,2])[1], digits=1) == 0.5
 end
