@@ -24,7 +24,7 @@ end
 
 #= Mutation functions =#
 @inline function mutateBias!(node::Node)
-    node.bias = rand(Uniform(-1,1))
+    node.bias = randBias()
 end
 
 @inline mutateAddConnection!(set::TrainingSet, l::Network) = addRandomConnection!(set, l)
@@ -39,7 +39,7 @@ end
 end
 
 @inline function mutateWeight!(c::Connection)
-    c.weight = rand(Uniform(-1, 1))
+    c.weight = randWeight()
 end
 
 @inline function mutateConnection!(c::Connection)

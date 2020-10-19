@@ -39,5 +39,5 @@ end
 end=#
 
 function selectionBest!(tset::TrainingSet)
-    sort!(tset.candidates, by=v->getFitness(v), rev=true)
+    sort!(tset)
 end

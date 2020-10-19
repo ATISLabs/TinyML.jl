@@ -1,11 +1,15 @@
-@inline getRandomWeight(W::Array{Float32, N}) where {N} = rand(Uniform(-1, 1))
-@inline getRandomWeight(W::BitTensor) = rand(Bool)
-@inline getRandomWeight(W::BitArray) = rand(Bool)
+@inline randBias(W::Array{Float32, N}) where {N} = randBias()
+@inline randBias(W::BitTensor) = rand(Bool)
+@inline randBias(W::BitArray) = rand(Bool)
+
+@inline randWeight(W::Array{Float32, N}) where {N} = randWeight()
+@inline randWeight(W::BitTensor) = rand(Bool)
+@inline randWeight(W::BitArray) = rand(Bool)
 
 @inline randomizeWeight(W::AbstractArray, i::Int, j::Int, rate::Float64) = 
-                                    rand() < rate ? getRandomWeight(W) : W[i,j]
+                                    rand() < rate ? randWeight(W) : W[i,j]
 @inline randomizeBias(bias::AbstractArray, i::Int, rate::Float64) = 
-                                    rand() < rate ? getRandomWeight(bias) : bias[i]
+                                    rand() < rate ? randBias(bias) : bias[i]
 
 @inline function mutate!(set::TrainingSet, net::Union{Dense,BitDense})
     w, b, rate = net.W, net.b, getMutationRate(set)

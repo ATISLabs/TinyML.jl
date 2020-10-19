@@ -14,7 +14,7 @@ mutable struct Connection
 
         c.in = in
         c.out = out
-        c.weight = rand(Uniform(-1, 1))
+        c.weight = randWeight()
         c.enabled = true
 
         return c
@@ -45,7 +45,7 @@ mutable struct Node
         n.connections = []
         n.outputState = false
         n.output = 0
-        n.bias = rand(Uniform(-1,1))
+        n.bias = randBias()
 
         return n
     end
@@ -219,8 +219,9 @@ mutable struct EvaluationLayer
 end
 
 #= Common/Other =#
-#@inline randFloatWeight() = rand(Uniform(-1, 1))
-#@inline randBinaryWeight() = rand([-1, 1])
+@inline randWeight() = Float32(rand(Uniform(-1, 1)))
+@inline randBias() = Float32(rand(Uniform(-1,1)))
+
 @inline getEvalsPerCandidate(set::TrainingSet) = set.evalsPerCandidate
 @inline getChain(set::TrainingSet) = set.chain
 @inline getFitness(candidate::Network) = candidate.fitness

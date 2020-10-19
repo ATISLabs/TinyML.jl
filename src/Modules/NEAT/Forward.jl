@@ -1,3 +1,11 @@
+function (l::NEATDense)(input::Array{<:Number,1})
+    forward(l, input, l.σ)
+end
+
+function (n::Network)(set::TrainingSet, input::Array{<:Number,1})
+    forward(n, input, set.σ)
+end
+
 @inline (e::EvaluationLayer)(input) = forward(e.net, input, e.σ)
 
 @inline (e::NEATDense)(input) = forward(e, input, e.σ)

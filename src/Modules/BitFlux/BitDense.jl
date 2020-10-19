@@ -74,9 +74,9 @@ TrainingWeights(bit::BitTensor{2}) = TrainingData{2}(bit, Float32.(bit))
     t.float[i]
 @inline Base.getindex(t::TrainingData, I::Vararg{Int, N}) where {N} =
     t.float[I...]
-@inline Base.setindex!(t::TrainingData, value::Float64, i::Int) = 
+@inline Base.setindex!(t::TrainingData, value::Float32, i::Int) = 
     t.float[i] = value
-@inline Base.setindex!(t::TrainingData, value::Float64, I::Vararg{Int, N}) where {N} = 
+@inline Base.setindex!(t::TrainingData, value::Float32, I::Vararg{Int, N}) where {N} = 
     t.float[i] = value
 @inline getFloatArray(t::TrainingData) = t.float
 @inline getBitArray(t::TrainingData) = t.bit

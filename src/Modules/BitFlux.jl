@@ -6,9 +6,6 @@ module BitFlux
     #= Exports =#
     export BitDense, BitTensor
 
-    #= Constants =#
-    const binarynetlib = joinpath(@__DIR__, "BitFlux/ccall/binarynet.so")
-
     #= Includes =#
     include("./BitFlux/BitTensor.jl")
     include("./BitFlux/BitDense.jl")

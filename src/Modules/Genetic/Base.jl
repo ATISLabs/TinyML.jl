@@ -1,11 +1,11 @@
 struct Candidate
     net::Chain
-    fitness::Ref{Float32}
+    fitness::Ref{Float64}
 end
 
-@inline Candidate(net::Chain) = Candidate(net, Ref(0.f0))
+@inline Candidate(net::Chain) = Candidate(net, Ref(0.0))
 
-setFitness!(cand::Candidate, fitness::AbstractFloat) = cand.fitness[] = Float32(fitness)
+setFitness!(cand::Candidate, fitness::AbstractFloat) = cand.fitness[] = Float64(fitness)
 getFitness(cand::Candidate) = cand.fitness[]
 getNetwork(cand::Candidate) = cand.net
 
@@ -123,9 +123,11 @@ function updateLayer!(old::Union{Dense, BitDense}, new::Union{Dense, BitDense})
     old.b .= new.b
 end
 
-sort!(set::TrainingSet) = sort!(getCandidates(set), by=x->getFitness(x), rev=true)
+sort!(set::TrainingSet) = 
+    Base.sort!(getCandidates(set), by=x->getFitness(x), rev=true)
 
 @inline unsafeGetBest(set::TrainingSet) = getCandidates(set)[1]
+
 function getBest!(set::TrainingSet)
     sort!(set)
     return unsafeGetBest(set)
@@ -140,4 +142,7 @@ function updateChain!(set::TrainingSet)
 end
 
 #= Common/Other =#
+@inline randWeight() = Float32(rand(Uniform(-1,1)))
+@inline randBias() = Float32(rand(Uniform(-1,1)))
+
 @inline getChain(t::TrainingSet) = t.chain
