@@ -1,5 +1,5 @@
 function crossover!(set::TrainingSet)
-    children = Array{Network, 1}(undef, 0)
+    children = Array{Candidate, 1}(undef, 0)
 
     for specie in set.species
         maxChild = set.maxPopulation - set.popSize
@@ -34,7 +34,7 @@ end
     end
 end
 
-function crossoverCandidates(set::TrainingSet, f::Network, m::Network)
+function crossoverCandidates(set::TrainingSet, f::Candidate, m::Candidate)
     fittest, other = f.fitness > m.fitness ? (f,m) : (m,f)
     child = deepcopy(fittest)
 #=

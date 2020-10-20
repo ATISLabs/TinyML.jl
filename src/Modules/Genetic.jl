@@ -22,7 +22,7 @@ module Genetic
         
         function train!(tset::TrainingSet; 
                 genNumber::Integer=typemax(Int64), maxFitness::Float64=Inf64)
-            if !isTrained(tset)
+            if !isTrained!(tset)
                 evaluate!(tset)
             end
             gen = 0

@@ -23,14 +23,13 @@ module NEAT
         #= Genetic =#
         function train!(set::TrainingSet; genNumber::Int=typemax(Int64), 
                 maxFitness::Float64 = Inf64)
-            children::Array{Network} = []
-            if set.isTrained
+            children::Array{Candidate} = []
+            if isTrained!(set)
                 children = crossover!(set)
                 mutation!(set, children)
             else
                 children = getFirstChildren(set)
                 evaluate!(set, children)
-                set.isTrained = true
             end
 
             gen = 0

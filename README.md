@@ -4,7 +4,6 @@ A package focused on using bit operations with deep learning techniques for impr
 ## Features
 * **BitFlux:** A module containing bit layers and functions to be used with Flux. Also, its syntax is similar to Flux syntax.
 * **NEAT:** Implementation of the NEAT algorithm of reinforcement learning.
-* **Genetic:** The basic genetic algorithm of reinforcement learning.
 
 ## What can I do with it?
 Check this simple example bellow:
@@ -37,17 +36,17 @@ Mean time: 841.554 ns
 finput = rand(640)
 fdense = Dense(640, 64)
 --------------------------
-Mean time: 9.662μs
+Mean time: 9.662 μs
 ```
 * **Memory consumption:** By using BitDense you can achieve up to 32x less memory usage when comparing to regular Dense. Check an example bellow:
 ```
 fdense = Dense(640, 64)
 --------------------------
-Size: 5228 bytes
+Size: 164192 bytes
 
 bdense = BitDense(640, 64)
 --------------------------
-Size: 164192 bytes
+Size: 5228 bytes
 ```
 * **Convergence:** When training a model using BitDense instead of Dense, we could improve the convergence time by reducing the search space. Check an example bellow:
 ```

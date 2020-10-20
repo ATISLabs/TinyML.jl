@@ -133,3 +133,5 @@ end
     mat.chunks[ceil(Int, j / 64), i, lastDims...] &= ~(1 << jMod)
     mat.chunks[ceil(Int, j / 64), i, lastDims...] |= value << jMod 
 end
+
+#= Displays =# 

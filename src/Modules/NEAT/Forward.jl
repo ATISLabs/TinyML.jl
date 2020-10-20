@@ -2,7 +2,7 @@ function (l::NEATDense)(input::Array{<:Number,1})
     forward(l, input, l.σ)
 end
 
-function (n::Network)(set::TrainingSet, input::Array{<:Number,1})
+function (n::Candidate)(set::TrainingSet, input::Array{<:Number,1})
     forward(n, input, set.σ)
 end
 

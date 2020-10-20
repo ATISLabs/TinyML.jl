@@ -1,4 +1,4 @@
-function mutation!(set::TrainingSet, children::Array{Network,1})
+function mutation!(set::TrainingSet, children::Array{Candidate,1})
     for child in children
         if set.addConnectionMutationRate > rand()
             mutateAddConnection!(set, child)
@@ -27,9 +27,9 @@ end
     node.bias = randBias()
 end
 
-@inline mutateAddConnection!(set::TrainingSet, l::Network) = addRandomConnection!(set, l)
+@inline mutateAddConnection!(set::TrainingSet, l::Candidate) = addRandomConnection!(set, l)
 
-@inline function mutateAddNode!(set::TrainingSet, l::Network)
+@inline function mutateAddNode!(set::TrainingSet, l::Candidate)
     conKey = rand(keys(l.connections))
     node = addNode!(set, l)
 

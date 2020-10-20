@@ -27,7 +27,7 @@ end
 function mutation!(set::TrainingSet)
     cands = getChildren(set)
     Threads.@threads for child in cands
-        layers = getNetwork(child).layers
+        layers = getCandidate(child).layers
         for i in set.indexes
             mutate!(set, layers[i])
         end

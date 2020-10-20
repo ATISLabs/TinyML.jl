@@ -1,4 +1,4 @@
-function selection!(set::TrainingSet, children::Array{Network,1})
+function selection!(set::TrainingSet, children::Array{Candidate,1})
     sortSpecies!(set.species)
     killSpeciesExcess(set)
     killBadlyPerformed(set)
@@ -36,7 +36,7 @@ function killBadlyPerformed(set::TrainingSet)
     end
 end
 
-function δ(set::TrainingSet, cand1::Network, cand2::Network)
+function δ(set::TrainingSet, cand1::Candidate, cand2::Candidate)
     disjoint, excess, matching, weight = 0,0,0,0
     nFactor = length(cand1.innovations) > length(cand2.innovations) ? 
                 length(cand1.innovations) : length(cand2.innovations)
@@ -59,10 +59,10 @@ end
 
 @inline sh(set::TrainingSet, delta::Number) = delta < set.deltaThreshold
 
-@inline isSameSpecie(set::TrainingSet, cand1::Network, cand2::Network) = 
+@inline isSameSpecie(set::TrainingSet, cand1::Candidate, cand2::Candidate) = 
                                                 sh(set, δ(set, cand1, cand2))
 
-function findSpecie(set::TrainingSet, cand::Network; sorted::Bool=false)
+function findSpecie(set::TrainingSet, cand::Candidate; sorted::Bool=false)
     if sorted
         for specie in set.species
             if isSameSpecie(set, unsafeGetRepresentant(specie), cand)
@@ -79,10 +79,10 @@ function findSpecie(set::TrainingSet, cand::Network; sorted::Bool=false)
     return nothing
 end
 
-@inline unsafeAdjustFitness!(specie::Specie, cand::Network) = 
+@inline unsafeAdjustFitness!(specie::Specie, cand::Candidate) = 
             cand.fitness = cand.fitness / length(specie)
 
-@inline adjustFitness!(set::TrainingSet, cand::Network) = 
+@inline adjustFitness!(set::TrainingSet, cand::Candidate) = 
             unsafeAdjustFitness!(findSpecie(set, cand), cand)
 
 function updatepopSize(set::TrainingSet)

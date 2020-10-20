@@ -67,13 +67,13 @@ mutable struct NEATDense <: NEATLayer
         l.in = in
         l.out = out
         l.σ = σ
-        initializeNetwork!(l, in, out)
+        initializeCandidate!(l, in, out)
 
         return l
     end
 end
 
-mutable struct Network <: NEATLayer
+mutable struct Candidate <: NEATLayer
     nodes::Dict{Int, Node}
     outputNodes::Array{Node, 1}
 
@@ -85,10 +85,10 @@ mutable struct Network <: NEATLayer
 
     outputState::Bool
 
-    function Network(in::Int, out::Int)
+    function Candidate(in::Int, out::Int)
         n = new()
 
-        initializeNetwork!(n, in, out)
+        initializeCandidate!(n, in, out)
         n.connections = Dict{Tuple{Int,Int},Connection}()
         n.innovations = Dict{Int, Connection}()
         n.fitness = 0
@@ -97,11 +97,11 @@ mutable struct Network <: NEATLayer
         return n
     end
 
-    Network(l::NEATDense) = Network(l.in, l.out)
+    Candidate(l::NEATDense) = Candidate(l.in, l.out)
 end
 
 mutable struct Specie
-    candidates::Array{Network,1}
+    candidates::Array{Candidate,1}
 
     function Specie()
         s = new()
@@ -198,7 +198,7 @@ mutable struct TrainingSet
         n.addConnectionMutationRate = addConnectionMutationRate
 
         n.species = [Specie()]
-        push!(n.species[1], Network(layer))
+        push!(n.species[1], Candidate(layer))
         addRandomConnection!(n, n.species[1].candidates[1])
 
         return n            
@@ -206,7 +206,7 @@ mutable struct TrainingSet
 end
 
 mutable struct EvaluationLayer
-    net::Network
+    net::Candidate
     σ::Function
 
     function EvaluationLayer(set::TrainingSet)
@@ -224,7 +224,14 @@ end
 
 @inline getEvalsPerCandidate(set::TrainingSet) = set.evalsPerCandidate
 @inline getChain(set::TrainingSet) = set.chain
-@inline getFitness(candidate::Network) = candidate.fitness
+@inline isTrained(set::TrainingSet) = set.isTrained
+@inline setTrained!(set::TrainingSet) = set.isTrained = true
+function isTrained!(set::TrainingSet)
+    setTrained!(set::TrainingSet)
+    return false
+end
+@inline getLayer(set::TrainingSet) = set.layer
+@inline getFitness(candidate::Candidate) = candidate.fitness
 
 function getEvaluationChain(set::TrainingSet)
     layers = []
@@ -242,10 +249,10 @@ function getEvaluationChain(set::TrainingSet)
     return Chain(layers...), index
 end
 
-@inline unsafeReplaceNetwork!(ev::Chain, index::Int, n::Network) = 
+@inline unsafeReplaceCandidate!(ev::Chain, index::Int, n::Candidate) = 
         ev.layers[index].net = n
 
-function replaceNetwork!(ev::Chain, n::Network)
+function replaceCandidate!(ev::Chain, n::Candidate)
     for layer in ev.layers
         if layer isa EvaluationLayer
             layer.net = n
@@ -253,7 +260,7 @@ function replaceNetwork!(ev::Chain, n::Network)
     end
 end
 
-function addRandomConnection!(set::TrainingSet, n::Network)
+function addRandomConnection!(set::TrainingSet, n::Candidate)
     #gets a random node from input nodes and hidden nodes as the connection input
     in = rand(1:(set.in + length(n.nodes) - set.out))
     #gets a random node from hidden nodes and output nodes as the connections output
@@ -262,7 +269,7 @@ function addRandomConnection!(set::TrainingSet, n::Network)
 end
 
 function getFirstChildren(set::TrainingSet)
-    n = Network(set.layer)
+    n = Candidate(set.layer)
     addRandomConnection!(set, n)
     return [n]
 end
@@ -288,7 +295,7 @@ end
 
 @inline addNode!(l::NEATDense) = unsafeAddNode!(l, l.in)
 
-@inline addNode!(set::TrainingSet, l::Network) = unsafeAddNode!(l, set.in)
+@inline addNode!(set::TrainingSet, l::Candidate) = unsafeAddNode!(l, set.in)
 
 function unsafeAddNode!(l::NEATLayer, in::Int)
     id = in + length(l.nodes) + 1
@@ -296,7 +303,7 @@ function unsafeAddNode!(l::NEATLayer, in::Int)
     return id
 end
 
-@inline function initializeNetwork!(l::NEATLayer, in::Int, out::Int)
+@inline function initializeCandidate!(l::NEATLayer, in::Int, out::Int)
     l.outputState = false
     l.nodes = Dict{Int, Node}()
     l.outputNodes = []
@@ -306,7 +313,7 @@ end
 end
 
 @inline function addConnection!(set::TrainingSet, 
-                                l::Network, in::Int, out::Int; 
+                                l::Candidate, in::Int, out::Int; 
                                 con::Connection=Connection(in, out))
     #If it already has the key, mutate its weight overwriting the object
     if haskey(l.connections, (in, out))
@@ -332,7 +339,7 @@ end
 
 @inline Base.getindex(s::Specie, i::Int) = s.candidates[i]
 
-@inline Base.push!(s::Specie, cand::Network) = push!(s.candidates, cand)
+@inline Base.push!(s::Specie, cand::Candidate) = push!(s.candidates, cand)
 
 @inline Base.sort!(s::Specie) = sort!(s.candidates, by=c->c.fitness, rev=true)
 
@@ -348,28 +355,63 @@ function unsafeGetRepresentant(s::Specie)
 end
 
 #= Displays =#
-function Base.display(set::TrainingSet)
-    println(`Number of species: $(length(set.species))`)
+function Base.show(io::IO, con::Connection)
+    print(io, "Connection(w=$(con.weight), i=$(con.in), o=$(con.out))")
 end
 
-function Base.display(con::Connection)
-    println(`Weight: $(con.weight) In: $(con.in) Out: $(con.out)`)
+function Base.show(io::IO, n::Node)
+    print(io, "Node(b=$(n.bias) conns=$(length(n.connections)))")
 end
 
-function Base.display(n::Node)
-    println(`Bias: $(n.bias)`)
-    display.(n.connections)
+function Base.show(io::IO, ca::NEATLayer)
+    print(io, "NEATLayer")
 end
 
-function Base.display(ca::NEATLayer)
-    display(ca.nodes)
+function Base.show(io::IO, n::Candidate)
+    print(io, "Candidate(fit=$(n.fitness), nodes=$(length(n.nodes)), conns=$(length(n.connections)))")
 end
 
-function Base.display(n::Network)
-    println(`Fitness: $(n.fitness)`)
-    display(n.nodes)
+function Base.show(io::IO, n::NEATDense)
+    print(io, "NEATDense(i=$(n.in), o=$(n.out), nodes=$(length(n.nodes)))")
+end
+
+function Base.show(io::IO, s::Specie)
+    print(io, "Specie($(length(s.candidates)))")
 end
 
 function Base.display(s::Specie)
-    display.(s.candidates)
+    display(s.candidates)
+end
+
+function Base.show(io::IO, l::TrainingSet)
+    print(io, "NEAT_TrainingSet(pop=$(l.popSize))")
+end
+
+function Base.display(l::TrainingSet)
+    print("""NEAT_TrainingSet
+Basic
+    Max population: $(l.maxPopulation)
+    Max species: $(l.maxSpecies)
+Evaluation
+    Evaluation per candidate: $(l.evalsPerCandidate)
+    Fitness function: $(l.fitnessFunc)
+Selection
+    Survival rate: $(l.survivalRate)
+    Delta threshold: $(l.deltaThreshold)
+    c1: $(l.c1)
+    c2: $(l.c2)
+    c3: $(l.c3)
+Crossover
+    Last innovation number: $(l.innovationNumber)
+    Reproduction rate: $(l.reproductionRate)
+Mutation
+    Bias mutation rate: $(l.biasMutationRate)
+    Weight mutation rate: $(l.weightMutationRate)
+    Toggle connection mutation rate: $(l.toggleConnectionMutationRate)
+    Add node mutation rate: $(l.addNodeMutationRate)
+    Add connection mutation rate: $(l.addConnectionMutationRate)
+Variable
+    Population size: $(l.popSize)
+    Number of species: $(length(l.species))
+    """)
 end

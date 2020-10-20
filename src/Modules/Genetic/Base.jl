@@ -39,6 +39,10 @@ end
 
 @inline setTrained(set::TrainingSet) = set.trained[] = true
 @inline isTrained(set::TrainingSet) = set.trained[]
+function isTrained!(set::TrainingSet)
+    setTrained(set)
+    return false
+end
 @inline getPopSize(set::TrainingSet) = set.popSize
 @inline getEvalsPerCandidate(set::TrainingSet) = set.evalsPerCandidate[]
 @inline getCandidates(set::TrainingSet) = set.candidates
@@ -146,3 +150,23 @@ end
 @inline randBias() = Float32(rand(Uniform(-1,1)))
 
 @inline getChain(t::TrainingSet) = t.chain
+
+#= Displays =#
+function Base.show(io::IO, t::Candidate)
+    print(io, "Candidate(fit=$(getFitness(t))")
+end
+
+function Base.show(io::IO, t::TrainingSet)
+    print(io, "TrainingSet(popSize=$(t.popSize))")
+end
+
+function Base.display(t::TrainingSet)
+    print("""Genetic_TrainingSet
+    Fitness function: $(t.fitnessFunc)
+    Population size: $(t.popSize)
+    Elitism: $(t.elitism)
+    Crossover divisor: $(t.crossoverDivisor)
+    Mutation rate: $(t.mutationRate),
+    Evaluations per candidate: $(t.evalsPerCandidate)
+    """)
+end

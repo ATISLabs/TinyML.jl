@@ -1,4 +1,4 @@
-function evaluate!(set::TrainingSet, children::Array{Network,1})
+function evaluate!(set::TrainingSet, children::Array{Candidate,1})
     Threads.@threads for thread in 0:(Threads.nthreads()-1)
         tChildren = copy(children)
         chain, index = getEvaluationChain(set)
@@ -9,7 +9,7 @@ function evaluate!(set::TrainingSet, children::Array{Network,1})
 
         for i in start:stop
             fitness = 0.0
-            unsafeReplaceNetwork!(chain, index, tChildren[i])
+            unsafeReplaceCandidate!(chain, index, tChildren[i])
             for j in 1:getEvalsPerCandidate(set)
                 fitness += fitnessFunc(chain)
             end
