@@ -4,6 +4,7 @@ A package focused on using bit operations with deep learning techniques for impr
 ## Features
 * **BitFlux:** A module containing bit layers and functions to be used with Flux. Also, its syntax is similar to Flux syntax.
 * **NEAT:** Implementation of the NEAT algorithm of reinforcement learning.
+* **Genetic:** The basic genetic algorithm of reinforcement learning.
 
 ## What can I do with it?
 Check this simple example bellow:
