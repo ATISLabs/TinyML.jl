@@ -28,6 +28,7 @@ module Genetic
             gen = 0
             while gen < genNumber && 
                     getFitness(unsafeGetBest(tset)) < maxFitness
+                println("Gen: $(gen) -- Fitness: $(getFitness(unsafeGetBest(tset)))")
                 selectionBest!(tset)
                 crossover!(tset)
                 mutation!(tset)

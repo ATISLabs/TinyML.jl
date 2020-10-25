@@ -35,6 +35,8 @@ module NEAT
             gen = 0
             while gen < genNumber && 
                     getFitness(unsafeGetRepresentant(set.species[1])) < maxFitness
+                println("Gen: $(gen) -- Fitness: ",
+                    "$(getFitness(unsafeGetRepresentant(set.species[1])))")
                 selection!(set, children)
                 children = crossover!(set)
                 mutation!(set, children)
