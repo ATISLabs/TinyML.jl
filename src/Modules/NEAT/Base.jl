@@ -9,15 +9,17 @@ mutable struct Connection
     weight::Float32
     enabled::Bool
 
-    function Connection(in::Int, out::Int; outputState=false)
+    function Connection(in::Int, out::Int; outputState=false,
+            w = randWeight(),
+            enabled = true)
         c = new()
 
         c.in = in
         c.out = out
-        c.weight = randWeight()
-        c.enabled = true
+        c.weight = w
+        c.enabled = enabled
 
-        return c
+        c
     end
 
     function Connection(con::Connection)
@@ -33,15 +35,18 @@ mutable struct Connection
 end
 
 mutable struct Node
+    id::Int
+
     output::Float32
     bias::Float32
 
     connections::Array{Connection, 1}
     outputState::Bool
 
-    function Node()
+    function Node(id::Int)
         n = new()
 
+        n.id = id
         n.connections = []
         n.outputState = false
         n.output = 0
@@ -81,6 +86,8 @@ mutable struct Candidate <: NEATLayer
     innovations::Dict{Int, Connection}
     maxInnov::Int
 
+    layers::Array{Array{Node, 1}, 1}
+
     fitness::Float64
 
     outputState::Bool
@@ -89,6 +96,7 @@ mutable struct Candidate <: NEATLayer
         n = new()
 
         initializeCandidate!(n, in, out)
+        n.layers = [n.outputNodes]
         n.connections = Dict{Tuple{Int,Int},Connection}()
         n.innovations = Dict{Int, Connection}()
         n.fitness = 0
@@ -112,7 +120,7 @@ mutable struct Specie
     end
 end
 
-mutable struct TrainingSet
+mutable struct TrainingSet{netType}
     #Basic
     chain::Chain
     layer::NEATDense
@@ -152,6 +160,7 @@ mutable struct TrainingSet
     function TrainingSet(chain::Chain,
             layer::NEATDense,
             fitnessFunc::Function;
+            feedForward::Bool=true,
             evalsPerCandidate::Int=1,
             c1=0.5,
             c2=0.5,
@@ -166,7 +175,7 @@ mutable struct TrainingSet
             toggleConnectionMutationRate=0.1,
             addNodeMutationRate=0.1,
             addConnectionMutationRate=0.1)
-        n = new()
+        n = new{feedForward ? :DFF : :NEAT}()
 
         n.chain = chain
         n.layer = layer
@@ -222,6 +231,10 @@ end
 @inline randWeight() = Float32(rand(Uniform(-1, 1)))
 @inline randBias() = Float32(rand(Uniform(-1,1)))
 
+@inline getNode(cand::Candidate, id::Int) = cand.nodes[id]
+@inline getId(node::Node) = node.id
+@inline getLayers(cand::Candidate) = cand.layers
+@inline getIn(set::TrainingSet) = set.in
 @inline getEvalsPerCandidate(set::TrainingSet) = set.evalsPerCandidate
 @inline getChain(set::TrainingSet) = set.chain
 @inline isTrained(set::TrainingSet) = set.isTrained
@@ -261,10 +274,21 @@ function replaceCandidate!(ev::Chain, n::Candidate)
 end
 
 function addRandomConnection!(set::TrainingSet, n::Candidate)
-    #gets a random node from input nodes and hidden nodes as the connection input
+    #gets a random node from input nodes or hidden nodes as the connection input
     in = rand(1:(set.in + length(n.nodes) - set.out))
-    #gets a random node from hidden nodes and output nodes as the connections output
+    #gets a random node from hidden nodes or output nodes as the connection output
     out = rand(1:length(n.nodes)) + set.in
+    addConnection!(set, n, in, out)
+end
+
+function addRandomConnection!(set::TrainingSet{:DFF}, n::Candidate)
+    index = rand(1:length(n.layers))
+    if index == 1
+        in = rand(1:getIn(set))
+    else
+        in = getId(rand(n.layers[index-1]))
+    end
+    out = getId(rand(n.layers[index]))
     addConnection!(set, n, in, out)
 end
 
@@ -287,10 +311,7 @@ function updateDense!(set::TrainingSet)
 
     neat = set.layer
     neat.nodes = deepcopy(top.nodes)
-    neat.outputNodes = []
-    for i in (set.in+1):(set.out + set.in)
-        push!(neat.outputNodes, neat.nodes[i])
-    end
+    neat.outputNodes = [neat.nodes[getId(node)] for node in top.outputNodes]
 end
 
 @inline addNode!(l::NEATDense) = unsafeAddNode!(l, l.in)
@@ -299,7 +320,7 @@ end
 
 function unsafeAddNode!(l::NEATLayer, in::Int)
     id = in + length(l.nodes) + 1
-    push!(l.nodes, id => Node())
+    push!(l.nodes, id => Node(id))
     return id
 end
 
@@ -313,7 +334,9 @@ end
 end
 
 @inline function addConnection!(set::TrainingSet, 
-                                l::Candidate, in::Int, out::Int; 
+                                l::Candidate, 
+                                in::Int,
+                                out::Int;
                                 con::Connection=Connection(in, out))
     #If it already has the key, mutate its weight overwriting the object
     if haskey(l.connections, (in, out))
