@@ -136,6 +136,7 @@ mutable struct TrainingSet{netType}
     #Evaluation
     evalsPerCandidate::Int
     fitnessFunc::Function
+    additionalData::Any
 
     #Selection
     species::Array{Specie, 1}
@@ -162,6 +163,7 @@ mutable struct TrainingSet{netType}
             fitnessFunc::Function;
             feedForward::Bool=true,
             evalsPerCandidate::Int=1,
+            additionalData=nothing,
             c1=0.5,
             c2=0.5,
             c3=0.5,
@@ -183,6 +185,7 @@ mutable struct TrainingSet{netType}
         n.isTrained = false
         n.layer = layer
         n.evalsPerCandidate = evalsPerCandidate
+        n.additionalData = additionalData
         n.σ = layer.σ
         n.in = layer.in
         n.out = layer.out
@@ -231,6 +234,7 @@ end
 @inline randWeight() = Float32(rand(Uniform(-1, 1)))
 @inline randBias() = Float32(rand(Uniform(-1,1)))
 
+@inline getAdditionalData(set::TrainingSet) = set.additionalData
 @inline getNode(cand::Candidate, id::Int) = cand.nodes[id]
 @inline getId(node::Node) = node.id
 @inline getLayers(cand::Candidate) = cand.layers

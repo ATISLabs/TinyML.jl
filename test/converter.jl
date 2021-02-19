@@ -2,7 +2,7 @@
     @testset "DirectConverter" begin
         println("Training NEAT")
         net = Chain(NEAT.NEATDense(2,1))
-        func(net::Chain) = 1 / abs(net([3,2])[1] - 0.5)
+        func(net::Chain, none) = 1 / abs(net([3,2])[1] - 0.5)
         set = NEAT.TrainingSet(net, net.layers[1], func, feedForward=true)
         NEAT.train!(set, maxFitness=500.0)
 

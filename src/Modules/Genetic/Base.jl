@@ -17,6 +17,7 @@ struct TrainingSet{N}
 
     candidates::Array{Candidate, 1}
     fitnessFunc::Function
+    additionalData::Any
 
     trained::Ref{Bool}
     popSize::Int
@@ -77,6 +78,7 @@ function generateInitialPopulation!(set::TrainingSet)
 end
 
 function TrainingSet(chain::Chain, layers::Tuple, fitnessFunc::Function; 
+                                additionalData=nothing,
                                 evalsPerCandidate::Int=1,
                                 popSize::Int=100,
                                 elitism::Int=10,
@@ -86,6 +88,7 @@ function TrainingSet(chain::Chain, layers::Tuple, fitnessFunc::Function;
                     getIndexes(chain, layers),
                     Array{Candidate, 1}(undef, popSize),
                     fitnessFunc,
+                    additionalData,
                     Ref(false),
                     popSize,
                     Ref(elitism),
@@ -150,6 +153,7 @@ end
 @inline randBias() = Float32(rand(Uniform(-1,1)))
 
 @inline getChain(t::TrainingSet) = t.chain
+@inline getAdditionalData(t::TrainingSet) = t.additionalData
 
 #= Displays =#
 function Base.show(io::IO, t::Candidate)
