@@ -2,8 +2,9 @@ module NEATConverter
     using ..Genetic
     using ..NEAT
     using Flux
-    using StaticArrays
-    using Distributions
+    using Reexport
 
-    include("NEATConverter/ReinforcementConverter.jl")
+    include("./NEATConverter/DirectConverter.jl")
+
+    @reexport using .DirectConverter
 end

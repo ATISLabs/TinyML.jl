@@ -366,7 +366,16 @@ end
 
 @inline Base.sort!(s::Specie) = sort!(s.candidates, by=c->c.fitness, rev=true)
 
+function Base.sort!(s::TrainingSet)
+    sort!(s.species, by=x->getFitness(getRepresentant!(x)), rev=true)
+end
+
 @inline getCandidates(s::Specie) = s.candidates
+
+function getRepresentant!(set::TrainingSet)
+    sort!(set)
+    return unsafeGetRepresentant(set.species[1])
+end
 
 function getRepresentant!(s::Specie)
     sort!(s)
