@@ -1,6 +1,7 @@
 module NEATConverter
     using ..Genetic
     using ..NEAT
+    using ..Misc
     using Flux
     using Reexport
 

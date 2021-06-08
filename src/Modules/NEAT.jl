@@ -1,11 +1,13 @@
 module NEAT
     using Reexport
     using ..BitFlux
+    using ..Misc
 
     module NEATCore
         #= Libraries =#
         using Distributions: Uniform
         using Flux
+        using ..Misc
 
         #= Upper Imports =#
         using ..BitFlux

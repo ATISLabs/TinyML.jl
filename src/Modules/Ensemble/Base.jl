@@ -1,4 +1,12 @@
-abstract type Metalearner end
+module EnsembleCore
 
-include("./StackedModel.jl")
-include("./Bagging.jl")
+    using ..Flux
+    using ..BitFlux
+    using ..Misc
+    using ..Genetic
+
+    include("./Structs/Ensemble.jl")
+
+    export Ensemble, classifiers, combiner
+
+end

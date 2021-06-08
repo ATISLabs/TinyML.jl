@@ -1,6 +1,7 @@
 module Genetic
     using Reexport
     using ..BitFlux
+    using ..Misc
 
     module GeneticCore
         #= Imports =#
@@ -9,8 +10,11 @@ module Genetic
 
         #= Upper import =#
         using ..BitFlux
+        using ..Misc
 
         #= Includes =#
+        include("./Genetic/Structs/Candidate.jl")
+        include("./Genetic/Structs/TrainingSet.jl")
         include("./Genetic/Base.jl")
         include("./Genetic/Selection.jl")
         include("./Genetic/Crossover.jl")
@@ -18,28 +22,11 @@ module Genetic
         include("./Genetic/Evaluate.jl")
 
         #= Exports =#
-        export train!, TrainingSet
-        
-        function train!(tset::TrainingSet; 
-                genNumber::Integer=typemax(Int64), maxFitness::Float64=Inf64)
-            if !isTrained!(tset)
-                evaluate!(tset)
-            end
-            gen = 0
-            while gen < genNumber && 
-                    getFitness(unsafeGetBest(tset)) < maxFitness
-                println("Gen: $(gen) -- Fitness: $(getFitness(unsafeGetBest(tset)))")
-                selectionBest!(tset)
-                crossover!(tset)
-                mutation!(tset)
-                evaluate!(tset)
-                gen += 1
-            end
-
-            updateChain!(tset)
-
-            return gen
-        end
+        export train!, TrainingSet, Candidate, fitness, fitness!,
+            network, elitism, elitism!, evals_per_candidate, evals_per_candidate!,
+            crossover_divisor, crossover_divisor!, mutation_rate, mutation_rate!, 
+            children, best, best!, gen, bestfitness, crossover_clone!, selection_best!,
+            mutation_rand!, evaluate!
     end
 
     @reexport using .GeneticCore

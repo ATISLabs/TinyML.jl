@@ -1,18 +1,15 @@
 module DirectConverter
     using Flux
     using ..NEAT
+    using ..Misc
 
     export to_denses
 
-    macro copy_weights!(dense, layer, second_indexer)
-        quote
-            local layer = $(esc(layer))
-            local dense = $(esc(dense))
-            for (j, node) in enumerate(layer)
-                dense.b[j] = node.bias
-                for con in node.connections
-                    dense.W[j, $(second_indexer)] = con.weight
-                end
+    function copy_weights!(dense::Dense, layer::AbstractArray, indexer::Function)
+        for (j, node) in enumerate(layer)
+            bias(dense)[j] = node.bias
+            for con in node.connections
+                weight(dense)[j, indexer(con)] = con.weight
             end
         end
     end
@@ -38,15 +35,14 @@ module DirectConverter
         out = length(layers[1])
         denses[1] = empty_dense(set.in, length(layers[1]), σ)
 
-        @copy_weights! denses[1] layers[1] con.in
-        for (i, prev, layer) in zip(2:length(layers),
-                                    @view(layers[1:end-1]), 
-                                    @view(layers[2:end]))
+        copy_weights!(denses[1], layers[1], (con) -> con.in)
+        for (prev, current) in zip(1:length(denses), 2:length(denses))
             in = out
-            out = length(layer)
+            out = length(layers[current])
             dense = empty_dense(in, out, σ)
-            @copy_weights! dense layer findfirst(x->x.id==con.in, :($prev))
-            denses[i] = dense
+            copy_weights!(dense, layers[current], 
+                (con) -> findfirst(x->x.id == con.in, layers[prev]))
+            denses[current] = dense
         end
 
         denses

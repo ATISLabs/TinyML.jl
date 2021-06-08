@@ -1,10 +1,9 @@
-function evaluate!(set::TrainingSet)
-    Threads.@threads for cand in getChildren(set)
-        data = deepcopy(getAdditionalData(set))
-        avg = 0.0
-        for i in 1:getEvalsPerCandidate(set)
-            avg += getFitnessFunction(set)(getNetwork(cand), data)
+function evaluate!(set::TrainingSet, fitness::Function)
+    Threads.@threads for cand in children(set)
+        sum = 0.0
+        for _ in 1:evals_per_candidate(set)
+            sum += fitness(network(cand))
         end
-        setFitness!(cand, avg / getEvalsPerCandidate(set))
+        fitness!(cand, sum / evals_per_candidate(set))
     end
 end

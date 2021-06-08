@@ -1,0 +1,16 @@
+TODO:
+    ☐ Supervisioned Learning
+        ☐ Reinforcement Supervisioned
+            ☐ Fitness function
+            ☐ Training
+                ☐ Let user decide the hyperparameters
+            ☐ Test
+    ☐ Ensemble
+        ☐ Bagging
+        ✔ Boosting @done(21-06-04 01:23)
+        ✔ Sampling @done(21-06-04 01:23)
+            ✔ No repetition sampling @done(21-06-04 01:23)
+    ☐ NEAT
+        ☐ Make the module syntax more Julian
+    ☐ CI/CD
+        ☐ Set travis up

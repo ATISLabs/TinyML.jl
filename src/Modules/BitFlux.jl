@@ -4,7 +4,7 @@ module BitFlux
     using Random: bitrand
 
     #= Exports =#
-    export BitDense, BitTensor
+    export BitDense, BitTensor, chunks
 
     #= Includes =#
     include("./BitFlux/BitTensor.jl")
