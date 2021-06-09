@@ -2,7 +2,7 @@ function crossovermix!(set::TrainingSet)
     cands = children(set)
     elitism = best(set)
 
-    Threads.@threads for child in cands
+    for child in cands
         father = network(rand(elitism)).layers
         mother = network(rand(elitism)).layers
         childl = network(child).layers

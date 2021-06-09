@@ -40,7 +40,7 @@ function generate_indexes(chain::Chain, layers::Tuple)
             end
         end
     end
-    Tuple(indexes...)
+    Tuple(indexes)
 end
 
 function initial_population!(set::TrainingSet)
